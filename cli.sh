@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
-#  HMPanel — CLI Manager
+#  HMray Panel — CLI Manager
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
 
@@ -625,7 +625,7 @@ print_header() {
   echo "  ██║  ██║██║ ╚═╝ ██║██║     ██║  ██║██║ ╚████║███████╗███████╗"
   echo "  ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝"
   echo -e "${NC}"
-  echo -e "  ${BOLD}HMPanel CLI Manager — Community Edition${NC}\n"
+  echo -e "  ${BOLD}HMray Panel CLI Manager — Community Edition${NC}\n"
 }
 
 HEADLESS="${HEADLESS:-false}"
@@ -698,7 +698,7 @@ cmd_info() {
 }
 
 cmd_update() {
-  echo -e "${BOLD}--- Update HMPanel ---${NC}\n"
+  echo -e "${BOLD}--- Update HMray Panel ---${NC}\n"
   echo "Downloading master updater from GitHub..."
   if curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/update.sh | bash; then
     echo -e "${GREEN}✔ Update complete!${NC}"
@@ -709,7 +709,7 @@ cmd_update() {
 }
 
 cmd_heal() {
-  echo -e "${BOLD}--- Heal HMPanel (emergency) ---${NC}\n"
+  echo -e "${BOLD}--- Heal HMray Panel (emergency) ---${NC}\n"
   if curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/heal-panel.sh | bash; then
     echo -e "${GREEN}✔ Heal finished.${NC}"
   else
@@ -2767,7 +2767,7 @@ cmd_ssl() {
 }
 
 cmd_uninstall() {
-  echo -e "${BOLD}--- Uninstall HMPanel ---${NC}\n"
+  echo -e "${BOLD}--- Uninstall HMray Panel ---${NC}\n"
   if [[ -f "${INSTALL_DIR}/uninstall.sh" ]]; then
     echo -e "${YELLOW}⚠ WARNING: You are about to uninstall the panel.${NC}"
     read -rp "Are you absolutely sure you want to proceed? [y/N]: " confirm
@@ -2800,7 +2800,7 @@ cmd_cleanup() {
 
 cmd_doctor() {
   if [[ "$JSON_OUTPUT" != "true" ]]; then
-    echo -e "${BOLD}--- HMPanel Doctor ---${NC}\n"
+    echo -e "${BOLD}--- HMray Panel Doctor ---${NC}\n"
   fi
   
   local docker_status="missing"
@@ -3675,7 +3675,7 @@ admin_reset_password() {
   local confirm_pass=""
 
   if ! docker inspect hmpanel-panel &>/dev/null; then
-    echo -e "${RED}✘ Panel container (hmpanel-panel) not found. Is HMPanel installed?${NC}" >&2
+    echo -e "${RED}✘ Panel container (hmpanel-panel) not found. Is HMray Panel installed?${NC}" >&2
     return 1
   fi
   if ! docker inspect -f '{{.State.Running}}' hmpanel-panel 2>/dev/null | grep -qi true; then
@@ -3879,7 +3879,7 @@ owner_login_env_set() {
 
 admin_reset_login() {
   if ! docker inspect hmpanel-panel &>/dev/null; then
-    echo -e "${RED}✘ Panel container (hmpanel-panel) not found. Is HMPanel installed?${NC}" >&2
+    echo -e "${RED}✘ Panel container (hmpanel-panel) not found. Is HMray Panel installed?${NC}" >&2
     return 1
   fi
   if ! docker inspect -f '{{.State.Running}}' hmpanel-panel 2>/dev/null | grep -qi true; then
@@ -3978,10 +3978,10 @@ cmd_reset_owner_login() {
 
 cmd_help() {
   cat <<EOF
-HMPanel CLI — usage: sudo hm [command]
+HMray Panel CLI — usage: sudo hm [command]
 
   (no command)                 Interactive menu
-  update                       Update HMPanel
+  update                       Update HMray Panel
   heal                         Fix 502 / auth drift
   doctor                       Diagnose the installation
   version                      Show installed version
@@ -4170,14 +4170,14 @@ while true; do
   
   echo -e "  1. Panel Status"
   echo -e "  2. Panel Information"
-  echo -e "  3. Update HMPanel"
+  echo -e "  3. Update HMray Panel"
   echo -e "  4. Create Backup"
   echo -e "  5. Restore Backup"
   echo -e "  6. Restart Services"
   echo -e "  7. View Logs"
   echo -e "  8. SSL Management"
   echo -e "  9. System Cleanup"
-  echo -e "  10. Uninstall HMPanel"
+  echo -e "  10. Uninstall HMray Panel"
   echo -e "  11. Heal Panel (fix 502 / auth drift)"
   echo -e "  12. Change Panel Ports"
   echo -e "  13. Reset Main Admin Password"

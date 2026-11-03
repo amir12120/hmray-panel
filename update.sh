@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
-#  HMPanel — Master Updater v1.3.0
+#  HMray Panel — Master Updater v1.3.0
 #  https://github.com/amir12120/hmray-panel
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
@@ -93,12 +93,12 @@ check_root() {
 }
 
 main() {
-  echo -e "${CYAN}${BOLD}HMPanel Master Updater v1.3.0${NC}"
+  echo -e "${CYAN}${BOLD}HMray Panel Master Updater v1.3.0${NC}"
   check_root
 
   INSTALL_DIR="/opt/hmpanel"
   if [[ ! -d "$INSTALL_DIR" ]]; then
-    die "HMPanel is not installed at ${INSTALL_DIR}. Is the panel installed?"
+    die "HMray Panel is not installed at ${INSTALL_DIR}. Is the panel installed?"
   fi
   
   cd "$INSTALL_DIR" || die "Failed to enter installation directory $INSTALL_DIR"
@@ -466,7 +466,7 @@ END \$\$;
     fi
   fi
 
-  log "HMPanel Panel successfully updated to version $(read_running_app_version)!"
+  log "HMray Panel Panel successfully updated to version $(read_running_app_version)!"
 
   info "Pruning old panel backups to free disk..."
   # Keep last 5 of each backup_* family (same policy as cli.sh do_backup)

@@ -3,10 +3,10 @@
 #  HMPanel — Reset main (owner / SUPER_ADMIN) password
 #
 #  One-liner (interactive):
-#    bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/reset-admin-password.sh)
+#    bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/reset-admin-password.sh)
 #
 #  One-liner (with password):
-#    bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/reset-admin-password.sh) 'YourNewPassword'
+#    bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/reset-admin-password.sh) 'YourNewPassword'
 #
 #  After update, you can also use:
 #    sudo hm admin reset-password

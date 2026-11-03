@@ -9,7 +9,7 @@ BUNDLE_VERSION="${BUNDLE_VERSION:-1.5.7}"
 cd "$INSTALL_DIR" || exit 1
 
 echo "==> [1/5] Sync panel infrastructure & pull images"
-curl -fsSL "https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/update.sh" -o /tmp/hmpanel-update.sh
+curl -fsSL "https://raw.githubusercontent.com/amir12120/hmray-panel/main/update.sh" -o /tmp/hmpanel-update.sh
 bash /tmp/hmpanel-update.sh
 
 echo "==> [2/5] Restart panel stack"

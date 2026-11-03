@@ -7,7 +7,7 @@
 نصب‌کنندهٔ رسمی:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/install.sh)
 ```
 
 نصب‌کننده این موارد را می‌پرسد:

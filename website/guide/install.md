@@ -7,7 +7,7 @@ Hosts: Ubuntu 20.04 or later, and Debian. A public IP address is required for Le
 Official installer:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/install.sh)
 ```
 
 The installer asks for:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
 #  HMPanel — Master Updater v1.3.0
-#  https://github.com/neoauroraproject/hmpanel
+#  https://github.com/amir12120/hmray-panel
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
 
@@ -103,7 +103,7 @@ main() {
   
   cd "$INSTALL_DIR" || die "Failed to enter installation directory $INSTALL_DIR"
   
-  REPO_URL="https://raw.githubusercontent.com/neoauroraproject/hmpanel/main"
+  REPO_URL="https://raw.githubusercontent.com/amir12120/hmray-panel/main"
 
   step "[1/8] Fetching Latest Infrastructure Files"
   info "Downloading latest docker-compose.yml..."
@@ -146,8 +146,8 @@ main() {
   fi
 
   step "[3/8] Rollback Safety & Database Backup"
-  if docker image inspect ghcr.io/neoauroraproject/hmpanel:latest &>/dev/null; then
-    docker tag ghcr.io/neoauroraproject/hmpanel:latest ghcr.io/neoauroraproject/hmpanel:rollback
+  if docker image inspect ghcr.io/amir12120/hmray-panel:latest &>/dev/null; then
+    docker tag ghcr.io/amir12120/hmray-panel:latest ghcr.io/amir12120/hmray-panel:rollback
     log "Current image tagged as rollback."
   else
     warn "No existing latest image found to tag as rollback."
@@ -322,8 +322,8 @@ END \$\$;
     # NEVER `compose down` before restore — that removes hmpanel-postgres and
     # makes `hm restore` fail with: No such container: hmpanel-postgres
     info "Reverting Docker image to previous version..."
-    if docker image inspect ghcr.io/neoauroraproject/hmpanel:rollback &>/dev/null; then
-      docker tag ghcr.io/neoauroraproject/hmpanel:rollback ghcr.io/neoauroraproject/hmpanel:latest
+    if docker image inspect ghcr.io/amir12120/hmray-panel:rollback &>/dev/null; then
+      docker tag ghcr.io/amir12120/hmray-panel:rollback ghcr.io/amir12120/hmray-panel:latest
     fi
 
     info "Ensuring postgres/redis are up for rollback restore..."
@@ -406,8 +406,8 @@ END \$\$;
     error "Health check timeout. Backend did not become healthy."
     echo "[UPDATE_FAILED] Health check timeout"
     warn "Attempting rollback to previous image..."
-    if docker image inspect ghcr.io/neoauroraproject/hmpanel:rollback &>/dev/null; then
-      docker tag ghcr.io/neoauroraproject/hmpanel:rollback ghcr.io/neoauroraproject/hmpanel:latest
+    if docker image inspect ghcr.io/amir12120/hmray-panel:rollback &>/dev/null; then
+      docker tag ghcr.io/amir12120/hmray-panel:rollback ghcr.io/amir12120/hmray-panel:latest
       compose up -d --remove-orphans || true
       sleep 8
       if docker exec hmpanel-panel curl -sf "http://127.0.0.1:4000/health" &>/dev/null; then

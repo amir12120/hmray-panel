@@ -13,7 +13,7 @@ fi
 cd "$INSTALL_DIR" || exit 1
 
 # Force download the new master updater
-curl -fsSL "https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/update.sh" -o update.sh
+curl -fsSL "https://raw.githubusercontent.com/amir12120/hmray-panel/main/update.sh" -o update.sh
 chmod +x update.sh
 
 # Run the new updater to sync all files and CLI

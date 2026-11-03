@@ -137,7 +137,7 @@ export class SettingsService {
 
       try {
         const response = await axios.get(
-          'https://api.github.com/repos/neoauroraproject/hmpanel/releases/latest',
+          'https://api.github.com/repos/amir12120/hmray-panel/releases/latest',
           { headers, timeout: 8000 },
         );
         releaseVersion = response.data?.tag_name || null;
@@ -148,7 +148,7 @@ export class SettingsService {
       // Same source hm update uses — VERSION on main tracks shipping image.
       try {
         const verRes = await axios.get(
-          'https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/VERSION',
+          'https://raw.githubusercontent.com/amir12120/hmray-panel/main/VERSION',
           { headers, timeout: 8000, responseType: 'text' },
         );
         mainVersion = String(verRes.data || '')
@@ -408,7 +408,7 @@ export class SettingsService {
         'echo "[3/7] Detached updater started" >> "$LOG"',
         // Latest update.sh first so fixes to the updater apply to this run too;
         // a captive page or error body must not be executed, hence the #! check.
-        `if curl -fsSL --max-time 60 https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/update.sh -o "${hostScript}.tmp" >> "$LOG" 2>&1 && head -n 1 "${hostScript}.tmp" | grep -q '^#!'; then`,
+        `if curl -fsSL --max-time 60 https://raw.githubusercontent.com/amir12120/hmray-panel/main/update.sh -o "${hostScript}.tmp" >> "$LOG" 2>&1 && head -n 1 "${hostScript}.tmp" | grep -q '^#!'; then`,
         `  mv "${hostScript}.tmp" "${hostScript}"`,
         '  echo "[updater] using latest update.sh from GitHub" >> "$LOG"',
         `elif [ -f "/host${installDir}/update.sh" ]; then`,

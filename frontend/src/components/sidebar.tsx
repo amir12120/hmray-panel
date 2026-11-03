@@ -51,7 +51,7 @@ export function Sidebar() {
           </div>
           {admin?.role === "SUPER_ADMIN" || (brand.custom && brand.showGithub) ? (
             <Link
-              href="https://github.com/neoauroraproject/hmpanel"
+              href="https://github.com/amir12120/hmray-panel"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-1.5 inline-flex cursor-pointer items-center gap-1 text-[11px] text-slate-500 outline-none transition-colors duration-200 hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:text-zinc-500 dark:hover:text-zinc-200"

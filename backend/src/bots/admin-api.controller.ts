@@ -41,7 +41,7 @@ export class AdminApiV1Controller {
   @ApiOperation({ summary: 'Where the API documentation lives' })
   async docs() {
     return {
-      guide: 'https://github.com/neoauroraproject/hmpanel/blob/main/docs/admin-api.md',
+      guide: 'https://github.com/amir12120/hmray-panel/blob/main/docs/admin-api.md',
       swaggerUi: '/api/api',
       openapi: { v1: '/api/v1/openapi.json', full: '/api/api-json' },
       auth: 'Authorization: Bearer hmp_…',

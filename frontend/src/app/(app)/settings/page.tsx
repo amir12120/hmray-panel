@@ -353,7 +353,7 @@ export default function GlobalSettingsPage() {
                   </span>
                 </div>
               <div className="pt-2 space-y-2">
-                <a href="https://github.com/neoauroraproject/hmpanel" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-blue-500 transition-colors">
+                <a href="https://github.com/amir12120/hmray-panel" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-blue-500 transition-colors">
                   <ExternalLink size={14} /> {t("nav.officialGithub")}
                 </a>
                 <a href="https://t.me/hmpanel" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-blue-500 transition-colors">

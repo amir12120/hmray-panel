@@ -1,13 +1,11 @@
 <div align="center">
 
-# HMPanel
-**Advanced 3x-ui Management Platform**
-
-![Visitors](https://api.visitorbadge.io/api/visitors?path=neoauroraproject.hmpanel&countColor=%23263759)
+# HMray Panel
+**Advanced 3x-ui Management Platform — independent build**
 
 [English](#english) | [فارسی](#فارسی)
 
-**Docs:** [neoauroraproject.github.io/hmpanel](https://neoauroraproject.github.io/hmpanel/) · Channel: [t.me/hmpanel](https://t.me/hmpanel) · Premium License: [t.me/hmraysupport](https://t.me/hmraysupport)
+**Repository:** [github.com/amir12120/hmray-panel](https://github.com/amir12120/hmray-panel) · **Upstream:** [HMPanel](https://github.com/neoauroraproject/hmpanel)
 
 </div>
 
@@ -15,17 +13,18 @@
 
 <h2 id="english">🇬🇧 English</h2>
 
-HMPanel is a **professional management layer built specifically on top of native 3x-ui**. Designed for VPN Providers, Resellers, and Administrators managing large client bases across multi-panel deployments.
+HMray Panel is a **professional management layer built specifically on top of native 3x-ui** (an independent build of HMPanel). Designed for VPN Providers, Resellers, and Administrators managing large client bases across multi-panel deployments.
 
 ### 📚 Documentation
 
-Documentation for Community and Premium editions: [https://neoauroraproject.github.io/hmpanel/](https://neoauroraproject.github.io/hmpanel/)
+Setup, operations and API guides live in the [`docs/`](docs) folder of this repository
+(some pages still describe features of the upstream editions).
 
 ### 🚀 Installation
 
 Execute the following on a fresh Ubuntu (24.04+) or Debian server:
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/install.sh)
 ```
 *(Requires: Direct public IP for Let's Encrypt SSL, 1GB RAM, 5GB Disk)*
 
@@ -56,7 +55,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/mai
 ### 🔑 Reset Main Admin Password
 Forgot the owner / SUPER_ADMIN password? Reset it from the server (interactive prompt):
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/reset-admin-password.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/reset-admin-password.sh)
 ```
 Or via CLI after install/update: `sudo hm admin reset-password` · `sudo hm passwd` · menu option **13**.
 
@@ -66,19 +65,20 @@ Forgot the owner **username** too? `sudo hm admin reset-login` (or `sudo hm rese
 
 <h2 id="فارسی">🇮🇷 فارسی</h2>
 
-اچ‌ام‌پنل (HMPanel) یک **لایه مدیریت حرفه‌ای و پیشرفته برای پنل‌های 3x-ui** است که منحصراً برای ارائه‌دهندگان VPN و ادمین‌هایی که چندین سرور و تعداد زیادی کاربر دارند طراحی شده است.
+اچ‌ام‌ری پنل (HMray Panel) یک **لایه مدیریت حرفه‌ای و پیشرفته برای پنل‌های 3x-ui** است (ساخت مستقل بر پایهٔ HMPanel) که منحصراً برای ارائه‌دهندگان VPN و ادمین‌هایی که چندین سرور و تعداد زیادی کاربر دارند طراحی شده است.
 
 ### 📚 مستندات
 
-مستندات نسخهٔ Community و Premium: [https://neoauroraproject.github.io/hmpanel/fa/](https://neoauroraproject.github.io/hmpanel/fa/)
+راهنماهای نصب، بهره‌برداری و API در پوشهٔ [`docs/`](docs) همین مخزن است
+(بخشی از صفحه‌ها هنوز قابلیت‌های نسخه‌های اصلی را توضیح می‌دهند).
 
-کانال تلگرام: [t.me/hmpanel](https://t.me/hmpanel) · خرید لایسنس نسخه پرمیوم: [t.me/hmraysupport](https://t.me/hmraysupport)
+مخزن: [github.com/amir12120/hmray-panel](https://github.com/amir12120/hmray-panel) · پروژهٔ اصلی: [HMPanel](https://github.com/neoauroraproject/hmpanel)
 
 ### 🚀 نصب و راه‌اندازی
 
 دستور زیر را در یک سرور اوبونتو (20.04+) یا دبیان جدید و خام وارد کنید:
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/install.sh)
 ```
 *(پیش‌نیازها: آی‌پی پابلیک مستقیم برای دریافت SSL، حداقل 1 گیگابایت رم، 5 گیگابایت فضای ذخیره‌سازی)*
 
@@ -110,7 +110,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/mai
 ### 🔑 ریست رمز ادمین اصلی
 اگر رمز ادمین اصلی (owner / SUPER_ADMIN) را فراموش کردید، روی سرور این دستور تک‌خطی را بزنید:
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/reset-admin-password.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/reset-admin-password.sh)
 ```
 یا بعد از نصب/آپدیت: `sudo hm admin reset-password` · `sudo hm passwd` · گزینه **۱۳** منوی `hm`.
 
@@ -129,7 +129,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/mai
 ---
 
 <div align="center">
-  <p>Released under the MIT License</p>
-  <p><strong>Crafted with ♥ by the HMPanel Team</strong></p>
-  <p>Official Telegram: <a href="https://t.me/hmpanel">@hmpanel</a> | GitHub: <a href="https://github.com/neoauroraproject/hmpanel">neoauroraproject/hmpanel</a></p>
+  <p><strong>HMray Panel</strong> — independent build maintained by <a href="https://github.com/amir12120">amir12120</a></p>
+  <p>Based on <a href="https://github.com/neoauroraproject/hmpanel">HMPanel</a> © the HMPanel Team, redistributed with the author's written permission. See <a href="NOTICE.md">NOTICE.md</a>.</p>
 </div>

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
 #  HMPanel — Interactive Installer v1.1
-#  https://github.com/neoauroraproject/hmpanel
+#  https://github.com/amir12120/hmray-panel
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
@@ -480,7 +480,7 @@ ensure_interactive_tty() {
   die "Interactive install needs a terminal.
 
   Run this instead (do not pipe into bash):
-    curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/install.sh -o /tmp/hmpanel-install.sh
+    curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/install.sh -o /tmp/hmpanel-install.sh
     bash /tmp/hmpanel-install.sh"
 }
 
@@ -860,7 +860,7 @@ step_1_configuration() {
     fi
   else
     info "Downloading files from GitHub..."
-    run_with_spinner "Cloning repository" git clone -b main https://github.com/neoauroraproject/hmpanel.git /tmp/hmpanel_install
+    run_with_spinner "Cloning repository" git clone -b main https://github.com/amir12120/hmray-panel.git /tmp/hmpanel_install
     run_with_spinner "Copying files to installation directory" cp -r /tmp/hmpanel_install/* "${INSTALL_DIR}/"
     rm -rf /tmp/hmpanel_install
   fi

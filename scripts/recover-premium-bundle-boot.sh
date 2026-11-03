@@ -6,7 +6,7 @@
 #  license D1 points at 1.8.73 — backend crash-loops or never becomes healthy.
 #
 #  Usage (on the server as root):
-#    curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/recover-premium-bundle-boot.sh | bash
+#    curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/recover-premium-bundle-boot.sh | bash
 #
 #  Or with a local tarball already downloaded:
 #    BUNDLE_TAR=/tmp/premium-bundle-1.8.73.tar.gz bash scripts/recover-premium-bundle-boot.sh

@@ -2,7 +2,7 @@
 # ═══════════════════════════════════════════════════════════════════
 #  HMPanel — Verbose restore (always shows progress)
 #  Usage:
-#    curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/restore-backup.sh | bash -s -- YOUR_BACKUP.tar.gz
+#    curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/restore-backup.sh | bash -s -- YOUR_BACKUP.tar.gz
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
 
@@ -21,14 +21,14 @@ warn() { echo -e "${YELLOW}⚠${NC}  $*"; }
 cd "$INSTALL_DIR"
 
 info "Refreshing CLI from GitHub..."
-curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/cli.sh -o "${INSTALL_DIR}/cli.sh"
+curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/cli.sh -o "${INSTALL_DIR}/cli.sh"
 cp "${INSTALL_DIR}/cli.sh" /usr/local/bin/hmpanel
 chmod +x /usr/local/bin/hmpanel
 ln -sf /usr/local/bin/hmpanel /usr/local/bin/hm
 log "CLI refreshed."
 
 info "Healing stack first (ensure panel_db / credentials)..."
-curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/heal-panel.sh | bash || warn "Heal had warnings — continuing restore anyway."
+curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/heal-panel.sh | bash || warn "Heal had warnings — continuing restore anyway."
 
 info "Listing backups in ${INSTALL_DIR}/backups ..."
 ls -lt "${INSTALL_DIR}/backups"/*.tar.gz 2>/dev/null | head -20 || true

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
 #  HMPanel — Emergency heal (bring panel back after failed update/restore)
-#  Usage:  curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/heal-panel.sh | bash
+#  Usage:  curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/heal-panel.sh | bash
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
 
@@ -32,7 +32,7 @@ info "Healing HMPanel at $INSTALL_DIR ..."
 
 # Refresh host CLI so restore/update fixes are available immediately
 info "Refreshing hm CLI from GitHub..."
-if curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/cli.sh -o "${INSTALL_DIR}/cli.sh"; then
+if curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/cli.sh -o "${INSTALL_DIR}/cli.sh"; then
   cp "${INSTALL_DIR}/cli.sh" /usr/local/bin/hmpanel
   chmod +x /usr/local/bin/hmpanel
   ln -sf /usr/local/bin/hmpanel /usr/local/bin/hm
@@ -44,7 +44,7 @@ fi
 # Ensure compose file exists
 if [[ ! -f docker-compose.yml ]]; then
   info "Downloading docker-compose.yml..."
-  curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/docker-compose.yml -o docker-compose.yml \
+  curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/docker-compose.yml -o docker-compose.yml \
     || die "Failed to download docker-compose.yml"
 fi
 

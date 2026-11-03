@@ -1,6 +1,6 @@
 import { defineConfig, type DefaultTheme } from "vitepress";
 
-const REPO = "https://github.com/neoauroraproject/hmpanel";
+const REPO = "https://github.com/amir12120/hmray-panel";
 const CHANNEL = "https://t.me/hmpanel";
 const SUPPORT = "https://t.me/hmraysupport";
 

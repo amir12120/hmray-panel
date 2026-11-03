@@ -245,7 +245,7 @@ export function ApiKeysPanel() {
             </li>
             <li>
               <a
-                href="https://github.com/neoauroraproject/hmpanel/blob/main/docs/admin-api.md"
+                href="https://github.com/amir12120/hmray-panel/blob/main/docs/admin-api.md"
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-600 hover:underline"

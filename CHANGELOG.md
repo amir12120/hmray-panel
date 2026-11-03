@@ -98,7 +98,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - **Reset main admin password from the server:** `sudo hm admin reset-password` (also `sudo hm passwd` and menu option 13). Updates the owner / SUPER_ADMIN hash, bumps `tokenVersion` to invalidate sessions, and syncs `INITIAL_ADMIN_PASSWORD` in `.env`.
-- **One-liner for locked-out installs:** `bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/reset-admin-password.sh)` — documented in the README (EN/FA).
+- **One-liner for locked-out installs:** `bash <(curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/reset-admin-password.sh)` — documented in the README (EN/FA).
 
 ## [2.5.8] - 2026-10-13
 

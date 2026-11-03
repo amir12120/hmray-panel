@@ -7,7 +7,7 @@ services:
 
   # ── Application (Backend API + Frontend) ─────────────────────────
   panel-app:
-    image: ghcr.io/neoauroraproject/hmpanel:latest
+    image: ghcr.io/amir12120/hmray-panel:latest
     container_name: hmpanel-panel
     restart: unless-stopped
     expose:

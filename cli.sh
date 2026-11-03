@@ -700,7 +700,7 @@ cmd_info() {
 cmd_update() {
   echo -e "${BOLD}--- Update HMPanel ---${NC}\n"
   echo "Downloading master updater from GitHub..."
-  if curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/update.sh | bash; then
+  if curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/update.sh | bash; then
     echo -e "${GREEN}✔ Update complete!${NC}"
   else
     echo -e "${RED}✘ Update failed!${NC}"
@@ -710,7 +710,7 @@ cmd_update() {
 
 cmd_heal() {
   echo -e "${BOLD}--- Heal HMPanel (emergency) ---${NC}\n"
-  if curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/heal-panel.sh | bash; then
+  if curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/heal-panel.sh | bash; then
     echo -e "${GREEN}✔ Heal finished.${NC}"
   else
     echo -e "${RED}✘ Heal failed — check docker logs.${NC}"
@@ -1232,7 +1232,7 @@ do_restore() {
     fi
     if [[ $db_restore_applied -eq 1 ]]; then
       rmsg "${YELLOW}⚠ Keeping restored database (will NOT roll back).${NC}"
-      rmsg "${YELLOW}  Run: curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/heal-panel.sh | bash${NC}"
+      rmsg "${YELLOW}  Run: curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/heal-panel.sh | bash${NC}"
       rmsg "${YELLOW}  Rollback snapshot kept at: ${rollback_file}${NC}"
       sync_credentials_after_restore "$silent" || true
       rm -rf "$temp_dir"
@@ -4117,10 +4117,10 @@ if [[ "$JSON_OUTPUT" == "true" || "${1:-}" == "ssl" || "${1:-}" == "doctor" || "
   elif [[ "$MODULE" == "version" ]]; then
     cmd_version
   elif [[ "$MODULE" == "heal" ]]; then
-    curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/scripts/heal-panel.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/scripts/heal-panel.sh | bash
     exit $?
   elif [[ "$MODULE" == "update" ]]; then
-    curl -fsSL https://raw.githubusercontent.com/neoauroraproject/hmpanel/main/update.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/amir12120/hmray-panel/main/update.sh | bash
     exit $?
   elif [[ "$MODULE" == "admin" ]]; then
     case "$ACTION" in

@@ -109,6 +109,11 @@
 
 خرید پرمیوم: [license.hmray.pro](https://license.hmray.pro) یا ربات [@neolicensebot](https://t.me/neolicensebot). لایسنس را در *تنظیمات ← لایسنس پرمیوم* وارد کنید.
 
+> **برای خودِ پنل کلید لایسنس لازم نیست.** هر چیزی که در این مخزن است — نصب، پنل و داشبورد،
+> مدیریت کلاینت‌ها و پنل‌ها، حسابداری ترافیک، CLI (`hm`)، آپدیتر، بکاپ، API و مستندات — با
+> `RELEASE_MODE=COMMUNITY` (پیش‌فرض نصب) کامل و بدون هیچ کلیدی کار می‌کند. لایسنس فقط برای
+> **باندل پرمیوم** است که کدش بخشی از این مخزن نیست و جداگانه توسط فروشندهٔ آن ارائه می‌شود.
+
 <a id="نصب"></a>
 
 ### 🚀 نصب
@@ -248,6 +253,12 @@ Full list: [CHANGELOG.md](CHANGELOG.md).
 - **Panel Plus** (Eylan, Pasarguard), client templates, marketing campaigns, branding, themes, custom domains, monitoring and a backup center.
 
 Buy Premium: [license.hmray.pro](https://license.hmray.pro) or [@neolicensebot](https://t.me/neolicensebot). Enter the license in *Settings → Premium License*.
+
+> **The panel itself never needs a license key.** Everything in this repository — the installer,
+> the panel and dashboard, client and panel management, traffic accounting, the `hm` CLI, the
+> updater, backups, the API and the docs — works in full with `RELEASE_MODE=COMMUNITY` (the
+> installer default) and no key at all. A license is only for the **Premium bundle**, whose code
+> is not part of this repository and is delivered separately by its vendor.
 
 <a id="install"></a>
 

@@ -24,17 +24,31 @@ jobs:
     defaults:
       run:
         working-directory: website
+    # Pages has to be switched on once in Settings → Pages → Source: GitHub
+    # Actions. Creating the site needs repo admin, which GITHUB_TOKEN does not
+    # have, so the workflow checks first: it still builds (catching broken docs)
+    # and only skips publishing while Pages is off.
+    outputs:
+      pages_ready: ${{ steps.pages_check.outputs.available }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Forks often have Pages disabled, and `deploy-pages` then fails with a
-      # bare 404. `enablement: true` turns Pages on (workflow build type) using
-      # the run's own token, so the docs site publishes on the first push.
+      - name: Check Pages availability
+        id: pages_check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=GitHub Pages is off::Enable Settings → Pages → Source: GitHub Actions to publish the docs site. The build itself still runs."
+          fi
+
       - name: Setup Pages
+        if: steps.pages_check.outputs.available == 'true'
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -50,12 +64,14 @@ jobs:
         run: npm run build
 
       - name: Upload Pages artifact
+        if: steps.pages_check.outputs.available == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: website/.vitepress/dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.pages_ready == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -1,10 +1,10 @@
 {
-  "name": "hmpanel-backend",
+  "name": "hmray-panel-backend",
   "version": "3.0.1-hmray.1",
-  "description": "Backend for HMPanel Community Edition",
+  "description": "Backend for HMray Panel",
   "author": "",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

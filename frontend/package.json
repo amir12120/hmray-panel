@@ -1,5 +1,5 @@
 {
-  "name": "hmpanel-frontend",
+  "name": "hmray-panel-frontend",
   "version": "3.0.1-hmray.1",
   "private": true,
   "scripts": {
@@ -37,5 +37,6 @@
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "license": "SEE LICENSE IN LICENSE"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "hmpanel-docs",
+  "name": "hmray-panel-docs",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,5 +9,6 @@
   },
   "devDependencies": {
     "vitepress": "^1.6.3"
-  }
+  },
+  "license": "SEE LICENSE IN LICENSE"
 }

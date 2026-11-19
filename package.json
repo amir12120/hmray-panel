@@ -1,5 +1,5 @@
 {
-  "name": "hmpanel-root",
+  "name": "hmray-panel",
   "devDependencies": {
     "prisma": "^5.22.0"
   },
@@ -9,5 +9,16 @@
   "version": "3.0.1-hmray.1",
   "scripts": {
     "version:sync": "node scripts/sync-version.js"
+  },
+  "description": "HMray Panel — 3x-ui management platform for resellers and VPN providers",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "amir12120",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amir12120/hmray-panel.git"
+  },
+  "homepage": "https://github.com/amir12120/hmray-panel",
+  "bugs": {
+    "url": "https://github.com/amir12120/hmray-panel/issues"
   }
 }

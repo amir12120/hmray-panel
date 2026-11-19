@@ -4,7 +4,7 @@
 
 <h1>HMray Panel</h1>
 
-<p><b>Independent build</b> of <a href="https://github.com/neoauroraproject/hmpanel">HMPanel</a> (<a href="https://github.com/amir12120/hmray-panel">amir12120/hmray-panel</a>) — synced with upstream v3.0.1. See <a href="NOTICE.md">NOTICE.md</a>.</p>
+<p><b>Independent build</b> of <a href="https://github.com/neoauroraproject/hmpanel">HMPanel</a> (<a href="https://github.com/amir12120/hmray-panel">amir12120/hmray-panel</a>) — the project started from HMPanel v3.0.1 and is now developed here. See <a href="NOTICE.md">NOTICE.md</a> for provenance and <a href="LICENSE">LICENSE</a> for the terms.</p>
 
 <p><b>پنل مدیریت حرفه‌ای 3x-ui برای نماینده‌ها و ارائه‌دهندگان VPN</b><br>
 <sub>Advanced 3x-ui management platform for resellers and VPN providers</sub></p>
@@ -291,11 +291,36 @@ Forgot the owner **username** too? `sudo hm admin reset-login` (or `sudo hm rese
 
 ---
 
+<h2 id="license">📄 License</h2>
+
+- **HMray Panel work** (branding, installer, updater, CLI, docs and every change made in this
+  repository) — **MIT**. See [`LICENSE`](LICENSE).
+- **Imported upstream code** — keeps its own terms: code from HMPanel **v2.5.20 and earlier** is
+  MIT (upstream published it that way); code imported from **v2.5.21 → v3.0.1** ships upstream
+  without a LICENSE file and is redistributed here under the permission recorded in
+  [`NOTICE.md`](NOTICE.md). Copyright in those files stays with the upstream author.
+- **Premium edition** — not part of this repository; delivered separately by its vendor.
+
+<div dir="rtl">
+
+<h2 id="license-fa">📄 لایسنس</h2>
+
+- **کارهای HMray Panel** (برند، نصب‌کننده، آپدیتر، CLI، مستندات و هر تغییری که در این مخزن
+  انجام شده) زیر **MIT** منتشر می‌شود. فایل [`LICENSE`](LICENSE) را ببینید.
+- **کد بالادست** شرایط خودش را دارد: کد **v2.5.20 و قبل‌تر** با MIT منتشر شده بود؛ کد
+  **v2.5.21 تا v3.0.1** در بالادست بدون فایل لایسنس می‌آید و اینجا با اجازه‌ای که در
+  [`NOTICE.md`](NOTICE.md) ثبت شده بازتوزیع می‌شود. حق نشر آن فایل‌ها با نویسندهٔ بالادست است.
+- **نسخهٔ پرمیوم** بخشی از این مخزن نیست و جداگانه توسط فروشندهٔ آن ارائه می‌شود.
+
+</div>
+
+---
+
 <div align="center">
 
 ---
 
-### 🌌 NEO AURORA
+### 💬 Community & links
 
 <p>
   <a href="https://t.me/neoaurora">Telegram</a> &nbsp;·&nbsp;
@@ -314,47 +339,15 @@ Forgot the owner **username** too? `sudo hm admin reset-login` (or `sudo hm rese
 
 <br>
 
-### 💖 Support Our Development
-
-<p>
-  Your support helps us maintain and improve our open-source projects.
-</p>
-
-<p>
-  <a href="https://bscscan.com/address/0x94efb6642b8fcc591c28a8c04db2279908f66e18">
-    <img src="https://img.shields.io/badge/USDT-BEP20-26A17B?style=for-the-badge&logo=tether&logoColor=white" alt="USDT BEP20"/>
-  </a>
-  <br>
-  <code>0x94efb6642b8fcc591c28a8c04db2279908f66e18</code>
-</p>
-
-<p>
-  <a href="https://tonscan.org/address/UQD6NpICg2Q7nF_yFRrKW2_ZgB5LPI1X2KDK0JDjlivwhCJ5">
-    <img src="https://img.shields.io/badge/TON-Network-0098EA?style=for-the-badge&logo=ton&logoColor=white" alt="TON"/>
-  </a>
-  <br>
-  <code>UQD6NpICg2Q7nF_yFRrKW2_ZgB5LPI1X2KDK0JDjlivwhCJ5</code>
-</p>
-
-<p>
-  <a href="https://tronscan.org/#/address/TJsBskCPtbVk6gKxTkcocjJX2qNa62Mo1X">
-    <img src="https://img.shields.io/badge/TRON-Network-FF0000?style=for-the-badge&logo=tron&logoColor=white" alt="TRON"/>
-  </a>
-  <br>
-  <code>TJsBskCPtbVk6gKxTkcocjJX2qNa62Mo1X</code>
-</p>
-
-<br>
-
 ⭐ **Enjoying this project? Give it a star!**
 
 <p>
   Every star helps us grow and reach more developers.
 </p>
 
-**Crafted with ❤️ by the NeoAurora Team**
+**HMray Panel — an independent build of [HMPanel](https://github.com/neoauroraproject/hmpanel), maintained by [amir12120](https://github.com/amir12120)**
 
-<sub>Open Source · Built with Passion</sub>
+<sub>HMray Panel work is MIT licensed · imported upstream code keeps its own terms</sub>
 
 ---
 

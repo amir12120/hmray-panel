@@ -55,18 +55,18 @@ function sidebar(prefix: string, fa: boolean): DefaultTheme.SidebarItem[] {
 
 const footerEn = {
   message: `<a href="${REPO}">GitHub</a><a href="${CHANNEL}">Telegram</a><a href="${SUPPORT}">Buy license</a>`,
-  copyright: "HMPanel",
+  copyright: "HMray Panel",
 };
 
 const footerFa = {
   message: `<a href="${REPO}">GitHub</a><a href="${CHANNEL}">تلگرام</a><a href="${SUPPORT}">خرید لایسنس</a>`,
-  copyright: "HMPanel",
+  copyright: "HMray Panel",
 };
 
 export default defineConfig({
-  base: "/hmpanel/",
-  title: "HMPanel",
-  description: "Documentation for HMPanel Community and Premium editions.",
+  base: "/hmray-panel/",
+  title: "HMray Panel",
+  description: "Documentation for HMray Panel (an independent build of HMPanel).",
   lastUpdated: false,
   cleanUrls: false,
   ignoreDeadLinks: false,

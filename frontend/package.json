@@ -1,6 +1,6 @@
 {
   "name": "hmpanel-frontend",
-  "version": "2.5.20",
+  "version": "3.0.1-hmray.1",
   "private": true,
   "scripts": {
     "dev": "next dev",

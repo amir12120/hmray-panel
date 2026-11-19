@@ -20,9 +20,23 @@ import {
 import { io } from "socket.io-client";
 import { ConnectionDetailsModal } from "@/components/ConnectionDetailsModal";
 import { BulkCreateModal } from "./BulkCreateModal";
+import { ClientDetailsPanel } from "./ClientDetailsPanel";
 import { PluginSlot } from "@/components/PluginSlot";
 import { NodeInboundBadge } from "@/components/NodeInboundBadge";
 import { isXui380Plus } from "@/lib/panel-version";
+import { useUiStyle } from "@/store/uiStyle";
+import { MIconButton, MPrimaryButton, MSelect } from "@/components/modern/kit";
+import {
+  ClientExpiry,
+  ClientIdentity,
+  ClientStatus,
+  ClientUsage,
+  ModernAccountCard,
+  ModernClientsRail,
+  ModernClientsTop,
+  OwnerChip,
+  clientStatus,
+} from "./ModernClientsParts";
 
 const GB = 1024 ** 3;
 const CLIENTS_PANEL_TAB_KEY = "hmpanel.clients.panelId";
@@ -171,6 +185,7 @@ export default function ClientsPage() {
   const toast = useToast((s) => s.push);
   const adminUser = useAuth((s) => s.admin);
   const isSuperAdmin = adminUser?.role === "SUPER_ADMIN";
+  const { modern } = useUiStyle();
 
   const onlinesQuery = useQuery({
     queryKey: ["live-onlines"],
@@ -200,6 +215,12 @@ export default function ClientsPage() {
   const [status, setStatus] = useState("");
   const [expiry, setExpiry] = useState("");
   const [trafficRange, setTrafficRange] = useState("");
+  const [group, setGroup] = useState("");
+  const { data: groupList = [] } = useQuery<string[]>({
+    queryKey: ["client-groups"],
+    queryFn: async () => (await api.get<string[]>("/clients/groups")).data,
+    staleTime: 60_000,
+  });
 
   // Pagination State
   const [page, setPage] = useState(1);
@@ -264,7 +285,7 @@ export default function ClientsPage() {
 
   // Query Clients
   const { data, isLoading, isFetching, error } = useQuery<Paginated<Client>>({
-    queryKey: ["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange],
+    queryKey: ["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange, group],
     placeholderData: (previousData, previousQuery) => {
       if (!previousQuery) return undefined;
       const prevPanel = previousQuery.queryKey[6];
@@ -282,6 +303,7 @@ export default function ClientsPage() {
       if (status) params.append("status", status);
       if (expiry) params.append("expiry", expiry);
       if (trafficRange) params.append("trafficRange", trafficRange);
+      if (group) params.append("group", group);
 
       return (await api.get<Paginated<Client>>(`/clients?${params.toString()}`)).data;
     },
@@ -344,10 +366,10 @@ export default function ClientsPage() {
     onMutate: async (c: Client) => {
       // Optimistic UI updates
       await qc.cancelQueries({ queryKey: ["clients"] });
-      const previous = qc.getQueryData(["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange]);
+      const previous = qc.getQueryData(["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange, group]);
       
       qc.setQueryData(
-        ["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange],
+        ["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange, group],
         (old: any) => {
           if (!old) return old;
           return {
@@ -373,7 +395,7 @@ export default function ClientsPage() {
     onError: (err, variables, context) => {
       if (context?.previous) {
         qc.setQueryData(
-          ["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange],
+          ["clients", page, limit, search, adminId, inboundId, panelId, status, expiry, trafficRange, group],
           context.previous
         );
       }
@@ -677,6 +699,7 @@ export default function ClientsPage() {
     setStatus("");
     setExpiry("");
     setTrafficRange("");
+    setGroup("");
     setPage(1);
   };
 
@@ -695,8 +718,723 @@ export default function ClientsPage() {
   // Traffic Impact calculations for Delete Confirmation
   const totalAllocatedTraffic = Object.values(selectedClients).reduce((sum, c) => sum + Number(c.total), 0);
 
+  const ownOnlineCount = isSuperAdmin
+    ? onlineClients.length
+    : onlineClients.filter((c) => c && overviewData?.clientEmails?.map((e: string) => e.trim().toLowerCase()).includes(c.toLowerCase())).length;
+
+  const modernActions = (
+    <>
+      <PluginSlot name="clients.actions" />
+      {!isExternalProvider && (
+        <>
+          {!isNativeTypeTab && (
+            <MPrimaryButton
+              variant="ghost"
+              onClick={() => setBulkCreateOpen(true)}
+              disabled={trafficExhausted}
+              title={trafficExhausted ? t("clients.insufficientBalance") : undefined}
+            >
+              <Users size={16} /> {t("clients.bulkCreate")}
+            </MPrimaryButton>
+          )}
+          <MPrimaryButton
+            onClick={() => setAddOpen(true)}
+            disabled={trafficExhausted}
+            title={trafficExhausted ? t("clients.insufficientBalance") : undefined}
+          >
+            <Plus size={16} /> {t("clients.addClient")}
+          </MPrimaryButton>
+        </>
+      )}
+    </>
+  );
+
+  const modernSelects = (
+    <>
+      {isSuperAdmin && (
+        <MSelect
+          label={t("clients.allAdmins")}
+          value={adminId}
+          onChange={(v) => {
+            setAdminId(v);
+            setPage(1);
+          }}
+          className="min-w-40"
+        >
+          <option value="">{t("clients.allAdmins")}</option>
+          <option value="orphaned">{t("clients.noAdminDirect")}</option>
+          {adminsList?.data.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.username}
+            </option>
+          ))}
+        </MSelect>
+      )}
+      <MSelect
+        label={t("clients.allInbounds")}
+        value={inboundId}
+        onChange={(v) => {
+          setInboundId(v);
+          setPage(1);
+        }}
+        className="min-w-40 max-w-64"
+      >
+        <option value="">{t("clients.allInbounds")}</option>
+        {filterInbounds.map((i) => (
+          <option key={i.id} value={i.id}>
+            {i.remark ? `${i.remark} — ` : ''}{i.tag} ({i.protocol})
+          </option>
+        ))}
+      </MSelect>
+      {groupList.length ? (
+        <MSelect
+          label={t("clients.allGroups")}
+          value={group}
+          onChange={(v) => {
+            setGroup(v);
+            setPage(1);
+          }}
+          className="min-w-32"
+        >
+          <option value="">{t("clients.allGroups")}</option>
+          {groupList.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+        </MSelect>
+      ) : null}
+    </>
+  );
+
+  const modernDestinations = [
+    ...selectorPanels.map((p) => ({
+      id: p.id,
+      name: p.name,
+      note:
+        (p as any).operable === false
+          ? (p as any).connectionHealth === "DISABLED"
+            ? t("panels.disconnected")
+            : t("panels.premiumUnavailable")
+          : undefined,
+    })),
+    ...(showXuiTypeChip ? [{ id: "3x-ui", name: "3x-ui" }] : []),
+  ];
+
+  const modernAccount =
+    !isExternalProvider && !isNativeTypeTab && overviewData?.admin ? (
+      <ModernAccountCard
+        admin={overviewData.admin}
+        clientCount={overviewData.clientEmails?.length ?? 0}
+        onlineCount={ownOnlineCount}
+        isSuperAdmin={isSuperAdmin}
+        expiryLabel={
+          overviewData.admin.expiryTime > 0
+            ? overviewData.admin.expiryTime < Date.now()
+              ? t("common.expired")
+              : t("clients.daysRemaining", { count: Math.ceil((overviewData.admin.expiryTime - Date.now()) / (1000 * 60 * 60 * 24)) })
+            : t("common.never")
+        }
+      />
+    ) : null;
+
+  const clientsListBlock = (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={panelId || "none"}
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+          transition={panelSwitchEase}
+          className="space-y-6"
+        >
+      {/* KPI Header — always matches the selected destination */}
+      {isFetching && !data && !isExternalProvider ? (
+        <PanelSwitchSkeleton />
+      ) : isExternalProvider || isNativeTypeTab ? (
+        <PluginSlot name="clients.kpi.override" props={{ providerId: panelId }} />
+      ) : !modern && overviewData && overviewData.admin ? (
+        <div className="mb-4">
+          <div className="md:hidden flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">{t("clients.overviewStats")}</span>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800 transition-all block md:grid">
+            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
+              <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl"><Activity size={20} /></div>
+              <div>
+                <div className="text-xs text-zinc-500 font-medium">{t("clients.onlineClients")}</div>
+                <div className="text-xl font-bold text-zinc-900 dark:text-white">
+                  {isSuperAdmin 
+                    ? <>{onlineClients.length} <span className="text-sm font-normal text-zinc-500">({t("clients.global")})</span></>
+                    : onlineClients.filter(c => c && overviewData?.clientEmails?.map((e: string) => e.trim().toLowerCase()).includes(c.toLowerCase())).length} 
+                </div>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
+              <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl"><HardDrive size={20} /></div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-zinc-500 font-medium">{t("clients.availableTraffic")}</div>
+                <div className="text-xl font-bold text-zinc-900 dark:text-white">
+                  {overviewData.admin.unlimitedTraffic
+                    ? <span className="text-emerald-500">∞</span>
+                    : formatBytes(overviewData.admin.availableTraffic)}
+                </div>
+                <div className="text-[10px] text-zinc-400 mt-1">
+                  {overviewData.admin.unlimitedTraffic
+                    ? t("common.unlimited")
+                    : t("clients.outOf", { total: formatBytes(overviewData.admin.allTimeTraffic || 0) })}
+                  {overviewData.admin.quotaMode === "GLOBAL" && !overviewData.admin.unlimitedTraffic
+                    ? ` · ${t("clients.sharedPoolHint")}`
+                    : ""}
+                </div>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
+              <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl"><Users size={20} /></div>
+              <div>
+                <div className="text-xs text-zinc-500 font-medium">{t("clients.clientCapacity")}</div>
+                <div className="text-xl font-bold text-zinc-900 dark:text-white">
+                  {overviewData.admin.clientCapacity === 0 
+                    ? `${overviewData.clientEmails?.length ?? 0} / ∞` 
+                    : `${overviewData.clientEmails?.length ?? 0} / ${overviewData.admin.clientCapacity}`}
+                </div>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
+              <div className="p-3 bg-amber-500/10 text-amber-400 rounded-xl"><CalendarDays size={20} /></div>
+              <div>
+                <div className="text-xs text-zinc-500 font-medium">{isNativeTypeTab ? t("clients.panelTime") : t("clients.subscriptionExpiry")}</div>
+                <div className="text-xl font-bold text-zinc-900 dark:text-white">
+                  {overviewData.admin.expiryTime > 0 
+                    ? (overviewData.admin.expiryTime < Date.now() 
+                        ? t("common.expired")
+                        : t("clients.daysRemaining", { count: Math.ceil((overviewData.admin.expiryTime - Date.now()) / (1000 * 60 * 60 * 24)) })) 
+                    : t("common.never")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Main Table / Cards */}
+      {!(isFetching && !data && !isExternalProvider) && (
+      isExternalProvider ? (
+        <PluginSlot name="clients.list.override" props={{ providerId: panelId }} />
+      ) : (
+      <Card className={modern
+        ? "hm-client-list overflow-hidden p-0 border-0 bg-transparent md:border md:border-[var(--hm-line)] md:bg-[var(--hm-card)] md:rounded-[1.625rem] md:shadow-[var(--hm-shadow-card)]"
+        : "overflow-hidden p-0 bg-transparent md:bg-zinc-50 dark:bg-zinc-950 border-0 md:border md:border-zinc-200 dark:border-zinc-800"}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm block md:table">
+            <thead className="hidden md:table-header-group">
+              <tr className={modern
+                ? "border-b border-[var(--hm-line)] text-start text-[12px] font-medium text-zinc-500 dark:text-zinc-400"
+                : "border-b border-zinc-200 dark:border-zinc-800 text-start text-xs uppercase tracking-wide text-zinc-500 bg-white dark:bg-zinc-900/30 font-semibold"}>
+                <th className="w-12 px-4 py-3 text-center">
+                  <button
+                    onClick={handleSelectAll}
+                    className="text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors inline-block"
+                  >
+                    {allCurrentPageSelected ? (
+                      <CheckSquare size={16} className="text-blue-500" />
+                    ) : (
+                      <Square size={16} />
+                    )}
+                  </button>
+                </th>
+                <th className="px-4 py-3 font-medium">{t("clients.colUsername")}</th>
+                <th className="px-4 py-3 font-medium">{t("clients.colOwner")}</th>
+                <th className="px-4 py-3 font-medium">{t("clients.colTraffic")}</th>
+                <th className="px-4 py-3 font-medium">{t("clients.colExpiry")}</th>
+                <th className="px-4 py-3 font-medium">{t("clients.colStatus")}</th>
+                <th className="px-4 py-3 font-medium"></th>
+              </tr>
+            </thead>
+            <tbody className="block md:table-row-group space-y-3 md:space-y-0">
+              {displayClients.map((c, i) => {
+                const isExpanded = expandedId === c.id;
+                const isSelected = !!selectedClients[c.id];
+                const emailKey = c.email.trim().toLowerCase();
+                const isOnline = onlineClients.includes(emailKey);
+                const ipCount = onlineIps[emailKey] || onlineIps[c.email.trim()] || 0;
+                const openOnlineSessions = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  if (!isOnline && ipCount <= 0) return;
+                  setOnlineSessionsClient({
+                    email: c.email.trim(),
+                    label: c.remark || c.email,
+                  });
+                };
+                return (
+                  <AnimatePresence key={c.id}>
+                      <motion.tr
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: i * 0.03 }}
+                        onClick={() => {
+                          if (selectedCount > 0) {
+                            handleSelectOne(c);
+                          } else {
+                            setExpandedId(isExpanded ? null : c.id);
+                          }
+                        }}
+                        className={modern
+                          ? clsx(
+                              "block md:table-row cursor-pointer rounded-[1.4rem] border border-[var(--hm-line)] bg-[var(--hm-surface)] transition-colors md:rounded-none md:border-x-0 md:border-t-0 md:bg-transparent last:md:border-b-0 hover:md:bg-zinc-900/[0.025] dark:hover:md:bg-white/[0.03]",
+                              isSelected && "md:!bg-[var(--hm-accent-soft)]",
+                              isExpanded && "md:bg-zinc-900/[0.02] dark:md:bg-white/[0.02]",
+                            )
+                          : `block md:table-row bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 md:border-b md:border-x-0 md:border-t-0 md:border-zinc-200 dark:border-zinc-800/60 rounded-xl md:rounded-none last:border-b-0 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 transition-colors cursor-pointer ${
+                          isExpanded ? "bg-white dark:bg-zinc-900/20" : ""
+                        }`}
+                      >
+                      <td
+                        className="hidden md:table-cell px-4 py-3 text-center"
+                        onClick={(e) => { e.stopPropagation(); handleSelectOne(c); }}
+                      >
+                        <button
+                          className="text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                        >
+                          {isSelected ? (
+                            <CheckSquare size={16} className="text-blue-500" />
+                          ) : (
+                            <Square size={16} />
+                          )}
+                        </button>
+                      </td>
+                      <td className={modern ? "block md:table-cell px-4 py-3.5" : "block md:table-cell px-4 py-3"}>
+                        {modern ? (
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-2.5">
+                              <div className="md:hidden" onClick={(e) => { e.stopPropagation(); handleSelectOne(c); }}>
+                                {isSelected ? <CheckSquare size={18} className="text-blue-500" /> : <Square size={18} className="text-zinc-400" />}
+                              </div>
+                              <ClientIdentity
+                                name={c.email}
+                                remark={c.remark}
+                                online={isOnline}
+                                ipCount={ipCount}
+                                onSessions={openOnlineSessions}
+                                panelName={!panelId && accessiblePanels.length > 1 ? (c.inbound?.panel?.name || (c as any).panel?.name) : null}
+                              />
+                            </div>
+                            <div className="shrink-0 md:hidden">
+                              <ClientStatus status={clientStatus(c, isOnline)} ipCount={ipCount} onSessions={openOnlineSessions} />
+                            </div>
+                          </div>
+                        ) : (
+                        <>
+                        <div className="flex items-center justify-between md:justify-start gap-2">
+                          <div className="flex items-center gap-2">
+                            {/* Checkbox wrapper for mobile */}
+                            <div className="md:hidden" onClick={(e) => { e.stopPropagation(); handleSelectOne(c); }}>
+                              {isSelected ? (
+                                <CheckSquare size={18} className="text-blue-500" />
+                              ) : (
+                                <Square size={18} className="text-zinc-400" />
+                              )}
+                            </div>
+                            <div className="font-semibold text-zinc-800 dark:text-zinc-100">{c.email}</div>
+                            {isOnline && (
+                              <div className="flex items-center gap-1">
+                                <span className="relative flex h-2.5 w-2.5" title={t("common.online")}>
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                                </span>
+                                {ipCount > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={openOnlineSessions}
+                                    className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 px-1.5 py-0.5 rounded-md transition-colors"
+                                    title={t("clients.ipsConnected", { count: ipCount })}
+                                  >
+                                    {t("clients.ipShort", { count: ipCount })}
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Mobile status indicator - always visible */}
+                          <div className="md:hidden flex items-center gap-1">
+                            {(() => {
+                              const used = Number(c.up) + Number(c.down);
+                              const cap = Number(c.total);
+                              const outOfTraffic = cap > 0 && used >= cap;
+                              const expired = isExpired(c.expiryTime);
+                              
+                              if (!c.enable) return <Badge tone="gray">{t("common.disabled")}</Badge>;
+                              if (outOfTraffic) return <Badge tone="red">{t("clients.noTraffic")}</Badge>;
+                              if (expired) return <Badge tone="red">{t("common.expired")}</Badge>;
+                              if (isOnline) {
+                                return (
+                                  <button type="button" onClick={openOnlineSessions} className="inline-flex">
+                                    <Badge tone="green">
+                                      {t("common.online")}
+                                      {ipCount > 0 ? ` · ${ipCount}` : ""}
+                                    </Badge>
+                                  </button>
+                                );
+                              }
+                              return <Badge tone="blue">{t("common.active")}</Badge>;
+                            })()}
+                          </div>
+                        </div>
+                        {c.remark && (
+                          <div className="text-xs text-zinc-500 mt-1 md:mt-0 line-clamp-2 break-words" dir="auto" title={c.remark}>{c.remark}</div>
+                        )}
+                        {!panelId && accessiblePanels.length > 1 && (c.inbound?.panel?.name || (c as any).panel?.name) && (
+                          <div className="mt-1 inline-flex items-center gap-1 rounded bg-zinc-100 dark:bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
+                            <Database size={10} /> {c.inbound?.panel?.name || (c as any).panel?.name}
+                          </div>
+                        )}
+                        </>
+                        )}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3 text-zinc-600 dark:text-zinc-300">
+                        {modern ? <OwnerChip name={c.admin?.username} /> : (c.admin?.username || <Badge tone="gray">{t("clients.directPanel")}</Badge>)}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3">
+                        {modern ? <ClientUsage up={c.up} down={c.down} total={c.total} /> : <UsageBar up={c.up} down={c.down} total={c.total} />}
+                      </td>
+                      <td className="block md:table-cell px-4 py-3 text-zinc-600 dark:text-zinc-300">
+                        {modern ? (
+                          <>
+                            <div className="flex items-center justify-between gap-3 md:hidden">
+                              <ClientUsage up={c.up} down={c.down} total={c.total} />
+                              <ClientExpiry expiryTime={c.expiryTime} />
+                            </div>
+                            <div className="hidden md:block">
+                              <ClientExpiry expiryTime={c.expiryTime} />
+                            </div>
+                          </>
+                        ) : (
+                        <>
+                        <div className="md:hidden flex items-center justify-between">
+                          <UsageBar up={c.up} down={c.down} total={c.total} />
+                          <span className={`text-xs ms-2 whitespace-nowrap ${isExpired(c.expiryTime) ? "text-red-400 font-medium" : ""}`}>
+                            {formatExpiry(c.expiryTime)}
+                          </span>
+                        </div>
+                        <span className={`hidden md:inline ${isExpired(c.expiryTime) ? "text-red-400 font-medium" : ""}`}>
+                          {formatExpiry(c.expiryTime)}
+                        </span>
+                        </>
+                        )}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3">
+                        {modern ? <ClientStatus status={clientStatus(c, isOnline)} ipCount={ipCount} onSessions={openOnlineSessions} /> : (() => {
+                          const used = Number(c.up) + Number(c.down);
+                          const cap = Number(c.total);
+                          const outOfTraffic = cap > 0 && used >= cap;
+                          const expired = isExpired(c.expiryTime);
+                          
+                          if (!c.enable) {
+                            return (
+                              <div className="flex items-center gap-2" title={t("common.disabled")}>
+                                <span className="h-2 w-2 rounded-full bg-zinc-500"></span>
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400">{t("common.disabled")}</span>
+                              </div>
+                            );
+                          }
+                          if (outOfTraffic || expired) {
+                            return (
+                              <div className="flex items-center gap-2" title={outOfTraffic ? t("clients.outOfTraffic") : t("common.expired")}>
+                                <span className="h-2 w-2 rounded-full bg-red-500"></span>
+                                <span className="text-xs text-red-400">{outOfTraffic ? t("clients.noTraffic") : t("common.expired")}</span>
+                              </div>
+                            );
+                          }
+                          if (isOnline) {
+                            return (
+                              <button
+                                type="button"
+                                onClick={openOnlineSessions}
+                                className="flex items-center gap-2 rounded-md hover:bg-emerald-500/10 px-1.5 py-0.5 -mx-1.5 transition-colors"
+                                title={t("clients.ipsConnected", { count: ipCount || 1 })}
+                              >
+                                <span className="relative flex h-2 w-2">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                <span className="text-xs text-emerald-400">
+                                  {t("common.online")}
+                                  {ipCount > 0 ? ` (${ipCount})` : ""}
+                                </span>
+                              </button>
+                            );
+                          }
+                          return (
+                            <div className="flex items-center gap-2" title={t("common.active")}>
+                              <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+                              <span className="text-xs text-blue-400">{t("common.active")}</span>
+                            </div>
+                          );
+                        })()}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3 border-t border-zinc-200 dark:border-zinc-800/50 md:border-0 mt-2 md:mt-0" onClick={(e) => e.stopPropagation()}>
+                        {modern ? (
+                          <div className="flex items-center justify-end gap-0.5">
+                            <MIconButton
+                              label={c.enable ? t("clients.disableClient") : t("clients.enableClient")}
+                              tone={c.enable ? "live" : "default"}
+                              onClick={(e) => { e.stopPropagation(); toggle.mutate(c); }}
+                            >
+                              <Power size={16} />
+                            </MIconButton>
+                            <MIconButton label={t("clients.subscriptionQr")} tone="accent" onClick={(e) => { e.stopPropagation(); setConnectionDetailsClient(c); }}>
+                              <QrCode size={16} />
+                            </MIconButton>
+                            <MIconButton label={t("clients.editClient")} onClick={(e) => { e.stopPropagation(); setEditing(c); }}>
+                              <Edit2 size={16} />
+                            </MIconButton>
+                            <MIconButton
+                              label={t("clients.deleteClient")}
+                              tone="danger"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm(t("clients.deleteClientConfirm", { email: c.email }))) {
+                                  bulkMutation.mutate({ ids: [c.id], action: 'delete' });
+                                }
+                              }}
+                            >
+                              <Trash2 size={16} />
+                            </MIconButton>
+                          </div>
+                        ) : (
+                        <div className="flex flex-wrap items-center justify-start md:justify-end gap-1.5 md:gap-1.5 w-full">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggle.mutate(c);
+                            }}
+                            className={`p-2 rounded-lg transition-colors ${c.enable ? "text-emerald-400 hover:bg-emerald-400/10" : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
+                            title={c.enable ? t("clients.disableClient") : t("clients.enableClient")}
+                          >
+                            <Power size={16} />
+                          </motion.button>
+                          
+                          <motion.button
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setConnectionDetailsClient(c);
+                            }}
+                            className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
+                            title={t("clients.subscriptionQr")}
+                          >
+                            <QrCode size={16} />
+                          </motion.button>
+                          
+                          <motion.button
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditing(c);
+                            }}
+                            className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                            title={t("clients.editClient")}
+                          >
+                            <Edit2 size={16} />
+                          </motion.button>
+
+                          <motion.button
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm(t("clients.deleteClientConfirm", { email: c.email }))) {
+                                bulkMutation.mutate({ ids: [c.id], action: 'delete' });
+                              }
+                            }}
+                            className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                            title={t("clients.deleteClient")}
+                          >
+                            <Trash2 size={16} />
+                          </motion.button>
+                        </div>
+                        )}
+                      </td>
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.td
+                            initial={{ opacity: 0, height: 0, paddingBottom: 0, paddingTop: 0 }}
+                            animate={{ opacity: 1, height: "auto", paddingBottom: 16, paddingTop: 16 }}
+                            exit={{ opacity: 0, height: 0, paddingBottom: 0, paddingTop: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            className="block md:hidden px-4 border-t border-zinc-200 dark:border-zinc-800 mt-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex flex-wrap items-center justify-center gap-2 w-full">
+                              <motion.button
+                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggle.mutate(c);
+                                }}
+                                className={`flex flex-1 justify-center items-center gap-2 px-3 py-2 rounded-lg transition-colors border ${c.enable ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/10" : "text-zinc-500 border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800"}`}
+                              >
+                                <Power size={16} /> <span className="text-sm font-medium">{c.enable ? t("clients.disable") : t("clients.enable")}</span>
+                              </motion.button>
+                              
+                              <motion.button
+                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setConnectionDetailsClient(c);
+                                }}
+                                className="flex flex-1 justify-center items-center gap-2 px-3 py-2 text-blue-500 border border-blue-500/20 bg-blue-500/10 rounded-lg transition-colors"
+                              >
+                                <QrCode size={16} /> <span className="text-sm font-medium">{t("clients.qrLink")}</span>
+                              </motion.button>
+                              
+                              <motion.button
+                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditing(c);
+                                }}
+                                className="flex flex-1 justify-center items-center gap-2 px-3 py-2 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 rounded-lg transition-colors"
+                              >
+                                <Edit2 size={16} /> <span className="text-sm font-medium">{t("common.edit")}</span>
+                              </motion.button>
+
+                              <motion.button
+                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm(t("clients.deleteClientConfirm", { email: c.email }))) {
+                                    bulkMutation.mutate({ ids: [c.id], action: 'delete' });
+                                  }
+                                }}
+                                className="flex flex-1 justify-center items-center gap-2 px-3 py-2 text-red-500 border border-red-500/20 bg-red-500/10 rounded-lg transition-colors"
+                              >
+                                <Trash2 size={16} /> <span className="text-sm font-medium">{t("common.delete")}</span>
+                              </motion.button>
+                            </div>
+                          </motion.td>
+                        )}
+                      </AnimatePresence>
+                    </motion.tr>
+                    {isExpanded && (
+                      <motion.tr
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        className="hidden md:table-row bg-gradient-to-b from-blue-500/[0.03] to-transparent border border-t-0 border-zinc-200 dark:border-zinc-800 md:border-b md:border-x-0"
+                      >
+                        <td colSpan={7} className="px-4 py-4">
+                          <ClientDetailsPanel
+                            client={c}
+                            online={isOnline}
+                            onShowConnection={() => setConnectionDetailsClient(c)}
+                            onEdit={() => setEditing(c)}
+                          />
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
+                );
+              })}
+              {clients.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-500">
+                    {t("clients.noClientsFound")}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination Footer */}
+        {totalItems > 0 && (
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-zinc-200 dark:border-zinc-800 p-4 sm:flex-row bg-white dark:bg-zinc-900/10">
+            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+              <span>{t("common.show")}</span>
+              <select
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2 py-1 text-zinc-600 dark:text-zinc-300 outline-none"
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span>{t("common.perPage")}</span>
+              <span className="ms-4">
+                {t("common.paginationClients", {
+                  from: (page - 1) * limit + 1,
+                  to: Math.min(page * limit, totalItems),
+                  total: totalItems,
+                })}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="rounded-lg border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+              >
+                {t("common.previous")}
+              </button>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 px-2">
+                {t("common.pageOf", { page, total: totalPages || 1 })}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="rounded-lg border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+              >
+                {t("common.next")}
+              </button>
+            </div>
+          </div>
+        )}
+      </Card>
+      )
+      )}
+
+        </motion.div>
+      </AnimatePresence>
+  );
+
   return (
     <div className="space-y-6 pb-20">
+      {modern ? (
+        <ModernClientsTop
+          totalItems={isExternalProvider ? null : totalItems}
+          actions={modernActions}
+          status={status}
+          onStatus={(v) => {
+            setStatus(v);
+            setPage(1);
+          }}
+          counts={isSuperAdmin ? { online: ownOnlineCount } : {
+            online: ownOnlineCount,
+            "traffic-low": overviewData?.attention?.trafficLow,
+            "expiring-soon": overviewData?.attention?.expiringSoon,
+            disabled: overviewData?.attention?.disabled,
+            depleted: overviewData?.attention?.depleted,
+          }}
+          search={search}
+          onSearch={(v) => {
+            setSearch(v);
+            setPage(1);
+          }}
+          selects={modernSelects}
+          canReset={!!(search || adminId || inboundId || status || expiry || trafficRange || group)}
+          onReset={resetFilters}
+        />
+      ) : (
+      <>
       <PageHeader
         title={t("clients.title")}
         subtitle={
@@ -874,9 +1612,28 @@ export default function ClientsPage() {
               ))}
             </select>
           </div>
+          {groupList.length ? (
+            <div>
+              <select
+                value={group}
+                onChange={(e) => {
+                  setGroup(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300 outline-none focus:border-blue-500"
+              >
+                <option value="">{t("clients.allGroups")}</option>
+                {groupList.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
         </div>
 
-        {(search || adminId || inboundId || status || expiry || trafficRange) && (
+        {(search || adminId || inboundId || status || expiry || trafficRange || group) && (
           <div className="flex justify-end">
             <button
               onClick={resetFilters}
@@ -887,581 +1644,26 @@ export default function ClientsPage() {
           </div>
         )}
       </Card>
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={panelId || "none"}
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -10 }}
-          transition={panelSwitchEase}
-          className="space-y-6"
-        >
-      {/* KPI Header — always matches the selected destination */}
-      {isFetching && !data && !isExternalProvider ? (
-        <PanelSwitchSkeleton />
-      ) : isExternalProvider || isNativeTypeTab ? (
-        <PluginSlot name="clients.kpi.override" props={{ providerId: panelId }} />
-      ) : overviewData && overviewData.admin ? (
-        <div className="mb-4">
-          <div className="md:hidden flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">{t("clients.overviewStats")}</span>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800 transition-all block md:grid">
-            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
-              <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl"><Activity size={20} /></div>
-              <div>
-                <div className="text-xs text-zinc-500 font-medium">{t("clients.onlineClients")}</div>
-                <div className="text-xl font-bold text-zinc-900 dark:text-white">
-                  {isSuperAdmin 
-                    ? <>{onlineClients.length} <span className="text-sm font-normal text-zinc-500">({t("clients.global")})</span></>
-                    : onlineClients.filter(c => c && overviewData?.clientEmails?.map((e: string) => e.trim().toLowerCase()).includes(c.toLowerCase())).length} 
-                </div>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
-              <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl"><HardDrive size={20} /></div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs text-zinc-500 font-medium">{t("clients.availableTraffic")}</div>
-                <div className="text-xl font-bold text-zinc-900 dark:text-white">
-                  {overviewData.admin.unlimitedTraffic
-                    ? <span className="text-emerald-500">∞</span>
-                    : formatBytes(overviewData.admin.availableTraffic)}
-                </div>
-                <div className="text-[10px] text-zinc-400 mt-1">
-                  {overviewData.admin.unlimitedTraffic
-                    ? t("common.unlimited")
-                    : t("clients.outOf", { total: formatBytes(overviewData.admin.allTimeTraffic || 0) })}
-                  {overviewData.admin.quotaMode === "GLOBAL" && !overviewData.admin.unlimitedTraffic
-                    ? ` · ${t("clients.sharedPoolHint")}`
-                    : ""}
-                </div>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
-              <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl"><Users size={20} /></div>
-              <div>
-                <div className="text-xs text-zinc-500 font-medium">{t("clients.clientCapacity")}</div>
-                <div className="text-xl font-bold text-zinc-900 dark:text-white">
-                  {overviewData.admin.clientCapacity === 0 
-                    ? `${overviewData.clientEmails?.length ?? 0} / ∞` 
-                    : `${overviewData.clientEmails?.length ?? 0} / ${overviewData.admin.clientCapacity}`}
-                </div>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
-              <div className="p-3 bg-amber-500/10 text-amber-400 rounded-xl"><CalendarDays size={20} /></div>
-              <div>
-                <div className="text-xs text-zinc-500 font-medium">{isNativeTypeTab ? t("clients.panelTime") : t("clients.subscriptionExpiry")}</div>
-                <div className="text-xl font-bold text-zinc-900 dark:text-white">
-                  {overviewData.admin.expiryTime > 0 
-                    ? (overviewData.admin.expiryTime < Date.now() 
-                        ? t("common.expired")
-                        : t("clients.daysRemaining", { count: Math.ceil((overviewData.admin.expiryTime - Date.now()) / (1000 * 60 * 60 * 24)) })) 
-                    : t("common.never")}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {/* Main Table / Cards */}
-      {!(isFetching && !data && !isExternalProvider) && (
-      isExternalProvider ? (
-        <PluginSlot name="clients.list.override" props={{ providerId: panelId }} />
-      ) : (
-      <Card className="overflow-hidden p-0 bg-transparent md:bg-zinc-50 dark:bg-zinc-950 border-0 md:border md:border-zinc-200 dark:border-zinc-800">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm block md:table">
-            <thead className="hidden md:table-header-group">
-              <tr className="border-b border-zinc-200 dark:border-zinc-800 text-start text-xs uppercase tracking-wide text-zinc-500 bg-white dark:bg-zinc-900/30 font-semibold">
-                <th className="w-12 px-4 py-3 text-center">
-                  <button
-                    onClick={handleSelectAll}
-                    className="text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors inline-block"
-                  >
-                    {allCurrentPageSelected ? (
-                      <CheckSquare size={16} className="text-blue-500" />
-                    ) : (
-                      <Square size={16} />
-                    )}
-                  </button>
-                </th>
-                <th className="px-4 py-3 font-medium">{t("clients.colUsername")}</th>
-                <th className="px-4 py-3 font-medium">{t("clients.colOwner")}</th>
-                <th className="px-4 py-3 font-medium">{t("clients.colTraffic")}</th>
-                <th className="px-4 py-3 font-medium">{t("clients.colExpiry")}</th>
-                <th className="px-4 py-3 font-medium">{t("clients.colStatus")}</th>
-                <th className="px-4 py-3 font-medium"></th>
-              </tr>
-            </thead>
-            <tbody className="block md:table-row-group space-y-3 md:space-y-0">
-              {displayClients.map((c, i) => {
-                const isExpanded = expandedId === c.id;
-                const isSelected = !!selectedClients[c.id];
-                const emailKey = c.email.trim().toLowerCase();
-                const isOnline = onlineClients.includes(emailKey);
-                const ipCount = onlineIps[emailKey] || onlineIps[c.email.trim()] || 0;
-                const openOnlineSessions = (e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  if (!isOnline && ipCount <= 0) return;
-                  setOnlineSessionsClient({
-                    email: c.email.trim(),
-                    label: c.remark || c.email,
-                  });
-                };
-                return (
-                  <AnimatePresence key={c.id}>
-                      <motion.tr
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2, delay: i * 0.03 }}
-                        onClick={() => {
-                          if (selectedCount > 0) {
-                            handleSelectOne(c);
-                          } else {
-                            setExpandedId(isExpanded ? null : c.id);
-                          }
-                        }}
-                        className={`block md:table-row bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 md:border-b md:border-x-0 md:border-t-0 md:border-zinc-200 dark:border-zinc-800/60 rounded-xl md:rounded-none last:border-b-0 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 transition-colors cursor-pointer ${
-                          isExpanded ? "bg-white dark:bg-zinc-900/20" : ""
-                        }`}
-                      >
-                      <td
-                        className="hidden md:table-cell px-4 py-3 text-center"
-                        onClick={(e) => { e.stopPropagation(); handleSelectOne(c); }}
-                      >
-                        <button
-                          className="text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-                        >
-                          {isSelected ? (
-                            <CheckSquare size={16} className="text-blue-500" />
-                          ) : (
-                            <Square size={16} />
-                          )}
-                        </button>
-                      </td>
-                      <td className="block md:table-cell px-4 py-3">
-                        <div className="flex items-center justify-between md:justify-start gap-2">
-                          <div className="flex items-center gap-2">
-                            {/* Checkbox wrapper for mobile */}
-                            <div className="md:hidden" onClick={(e) => { e.stopPropagation(); handleSelectOne(c); }}>
-                              {isSelected ? (
-                                <CheckSquare size={18} className="text-blue-500" />
-                              ) : (
-                                <Square size={18} className="text-zinc-400" />
-                              )}
-                            </div>
-                            <div className="font-semibold text-zinc-800 dark:text-zinc-100">{c.email}</div>
-                            {isOnline && (
-                              <div className="flex items-center gap-1">
-                                <span className="relative flex h-2.5 w-2.5" title={t("common.online")}>
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-                                </span>
-                                {ipCount > 0 && (
-                                  <button
-                                    type="button"
-                                    onClick={openOnlineSessions}
-                                    className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 px-1.5 py-0.5 rounded-md transition-colors"
-                                    title={t("clients.ipsConnected", { count: ipCount })}
-                                  >
-                                    {t("clients.ipShort", { count: ipCount })}
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Mobile status indicator - always visible */}
-                          <div className="md:hidden flex items-center gap-1">
-                            {(() => {
-                              const used = Number(c.up) + Number(c.down);
-                              const cap = Number(c.total);
-                              const outOfTraffic = cap > 0 && used >= cap;
-                              const expired = isExpired(c.expiryTime);
-                              
-                              if (!c.enable) return <Badge tone="gray">{t("common.disabled")}</Badge>;
-                              if (outOfTraffic) return <Badge tone="red">{t("clients.noTraffic")}</Badge>;
-                              if (expired) return <Badge tone="red">{t("common.expired")}</Badge>;
-                              if (isOnline) {
-                                return (
-                                  <button type="button" onClick={openOnlineSessions} className="inline-flex">
-                                    <Badge tone="green">
-                                      {t("common.online")}
-                                      {ipCount > 0 ? ` · ${ipCount}` : ""}
-                                    </Badge>
-                                  </button>
-                                );
-                              }
-                              return <Badge tone="blue">{t("common.active")}</Badge>;
-                            })()}
-                          </div>
-                        </div>
-                        {c.remark && (
-                          <div className="text-xs text-zinc-500 mt-1 md:mt-0 line-clamp-2 break-words" dir="auto" title={c.remark}>{c.remark}</div>
-                        )}
-                        {!panelId && accessiblePanels.length > 1 && (c.inbound?.panel?.name || (c as any).panel?.name) && (
-                          <div className="mt-1 inline-flex items-center gap-1 rounded bg-zinc-100 dark:bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
-                            <Database size={10} /> {c.inbound?.panel?.name || (c as any).panel?.name}
-                          </div>
-                        )}
-                      </td>
-                      <td className="hidden md:table-cell px-4 py-3 text-zinc-600 dark:text-zinc-300">
-                        {c.admin?.username || <Badge tone="gray">{t("clients.directPanel")}</Badge>}
-                      </td>
-                      <td className="hidden md:table-cell px-4 py-3">
-                        <UsageBar up={c.up} down={c.down} total={c.total} />
-                      </td>
-                      <td className="block md:table-cell px-4 py-3 text-zinc-600 dark:text-zinc-300">
-                        <div className="md:hidden flex items-center justify-between">
-                          <UsageBar up={c.up} down={c.down} total={c.total} />
-                          <span className={`text-xs ms-2 whitespace-nowrap ${isExpired(c.expiryTime) ? "text-red-400 font-medium" : ""}`}>
-                            {formatExpiry(c.expiryTime)}
-                          </span>
-                        </div>
-                        <span className={`hidden md:inline ${isExpired(c.expiryTime) ? "text-red-400 font-medium" : ""}`}>
-                          {formatExpiry(c.expiryTime)}
-                        </span>
-                      </td>
-                      <td className="hidden md:table-cell px-4 py-3">
-                        {(() => {
-                          const used = Number(c.up) + Number(c.down);
-                          const cap = Number(c.total);
-                          const outOfTraffic = cap > 0 && used >= cap;
-                          const expired = isExpired(c.expiryTime);
-                          
-                          if (!c.enable) {
-                            return (
-                              <div className="flex items-center gap-2" title={t("common.disabled")}>
-                                <span className="h-2 w-2 rounded-full bg-zinc-500"></span>
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400">{t("common.disabled")}</span>
-                              </div>
-                            );
-                          }
-                          if (outOfTraffic || expired) {
-                            return (
-                              <div className="flex items-center gap-2" title={outOfTraffic ? t("clients.outOfTraffic") : t("common.expired")}>
-                                <span className="h-2 w-2 rounded-full bg-red-500"></span>
-                                <span className="text-xs text-red-400">{outOfTraffic ? t("clients.noTraffic") : t("common.expired")}</span>
-                              </div>
-                            );
-                          }
-                          if (isOnline) {
-                            return (
-                              <button
-                                type="button"
-                                onClick={openOnlineSessions}
-                                className="flex items-center gap-2 rounded-md hover:bg-emerald-500/10 px-1.5 py-0.5 -mx-1.5 transition-colors"
-                                title={t("clients.ipsConnected", { count: ipCount || 1 })}
-                              >
-                                <span className="relative flex h-2 w-2">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
-                                <span className="text-xs text-emerald-400">
-                                  {t("common.online")}
-                                  {ipCount > 0 ? ` (${ipCount})` : ""}
-                                </span>
-                              </button>
-                            );
-                          }
-                          return (
-                            <div className="flex items-center gap-2" title={t("common.active")}>
-                              <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-                              <span className="text-xs text-blue-400">{t("common.active")}</span>
-                            </div>
-                          );
-                        })()}
-                      </td>
-                      <td className="hidden md:table-cell px-4 py-3 border-t border-zinc-200 dark:border-zinc-800/50 md:border-0 mt-2 md:mt-0" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex flex-wrap items-center justify-start md:justify-end gap-1.5 md:gap-1.5 w-full">
-                          <motion.button
-                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggle.mutate(c);
-                            }}
-                            className={`p-2 rounded-lg transition-colors ${c.enable ? "text-emerald-400 hover:bg-emerald-400/10" : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
-                            title={c.enable ? t("clients.disableClient") : t("clients.enableClient")}
-                          >
-                            <Power size={16} />
-                          </motion.button>
-                          
-                          <motion.button
-                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setConnectionDetailsClient(c);
-                            }}
-                            className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
-                            title={t("clients.subscriptionQr")}
-                          >
-                            <QrCode size={16} />
-                          </motion.button>
-                          
-                          <motion.button
-                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditing(c);
-                            }}
-                            className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-                            title={t("clients.editClient")}
-                          >
-                            <Edit2 size={16} />
-                          </motion.button>
-
-                          <motion.button
-                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (confirm(t("clients.deleteClientConfirm", { email: c.email }))) {
-                                bulkMutation.mutate({ ids: [c.id], action: 'delete' });
-                              }
-                            }}
-                            className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-                            title={t("clients.deleteClient")}
-                          >
-                            <Trash2 size={16} />
-                          </motion.button>
-                        </div>
-                      </td>
-                      <AnimatePresence>
-                        {isExpanded && (
-                          <motion.td
-                            initial={{ opacity: 0, height: 0, paddingBottom: 0, paddingTop: 0 }}
-                            animate={{ opacity: 1, height: "auto", paddingBottom: 16, paddingTop: 16 }}
-                            exit={{ opacity: 0, height: 0, paddingBottom: 0, paddingTop: 0 }}
-                            transition={{ duration: 0.25, ease: "easeOut" }}
-                            className="block md:hidden px-4 border-t border-zinc-200 dark:border-zinc-800 mt-2"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <div className="flex flex-wrap items-center justify-center gap-2 w-full">
-                              <motion.button
-                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggle.mutate(c);
-                                }}
-                                className={`flex flex-1 justify-center items-center gap-2 px-3 py-2 rounded-lg transition-colors border ${c.enable ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/10" : "text-zinc-500 border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800"}`}
-                              >
-                                <Power size={16} /> <span className="text-sm font-medium">{c.enable ? t("clients.disable") : t("clients.enable")}</span>
-                              </motion.button>
-                              
-                              <motion.button
-                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setConnectionDetailsClient(c);
-                                }}
-                                className="flex flex-1 justify-center items-center gap-2 px-3 py-2 text-blue-500 border border-blue-500/20 bg-blue-500/10 rounded-lg transition-colors"
-                              >
-                                <QrCode size={16} /> <span className="text-sm font-medium">{t("clients.qrLink")}</span>
-                              </motion.button>
-                              
-                              <motion.button
-                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditing(c);
-                                }}
-                                className="flex flex-1 justify-center items-center gap-2 px-3 py-2 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 rounded-lg transition-colors"
-                              >
-                                <Edit2 size={16} /> <span className="text-sm font-medium">{t("common.edit")}</span>
-                              </motion.button>
-
-                              <motion.button
-                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (confirm(t("clients.deleteClientConfirm", { email: c.email }))) {
-                                    bulkMutation.mutate({ ids: [c.id], action: 'delete' });
-                                  }
-                                }}
-                                className="flex flex-1 justify-center items-center gap-2 px-3 py-2 text-red-500 border border-red-500/20 bg-red-500/10 rounded-lg transition-colors"
-                              >
-                                <Trash2 size={16} /> <span className="text-sm font-medium">{t("common.delete")}</span>
-                              </motion.button>
-                            </div>
-                          </motion.td>
-                        )}
-                      </AnimatePresence>
-                    </motion.tr>
-                    {isExpanded && (
-                      <motion.tr
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25, ease: "easeOut" }}
-                        className="hidden md:table-row bg-white dark:bg-zinc-900/40 border border-t-0 border-zinc-200 dark:border-zinc-800 md:border-b md:border-x-0"
-                      >
-                        <td colSpan={7} className="px-4 py-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                            <div className="space-y-1">
-                              <div className="text-xs text-zinc-500 uppercase font-semibold">{t("clients.connectionDetails")}</div>
-                              <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950 p-2 rounded border border-zinc-200 dark:border-zinc-800">
-                                <span className="text-zinc-600 dark:text-zinc-400">{t("clients.panelLabel")}</span>
-                                <span className="font-medium text-zinc-900 dark:text-zinc-100">{c.inbound?.panel?.name || t("common.unknown")}</span>
-                              </div>
-                              <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950 p-2 rounded border border-zinc-200 dark:border-zinc-800">
-                                <span className="text-zinc-600 dark:text-zinc-400">{t("clients.inboundLabel")}</span>
-                                <span className="font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
-                                  {c.inbounds?.length ? c.inbounds.slice(0, 2).map((i: any) => i.tag).join(', ') : (c.inbound?.tag || t("common.unknown"))}
-                                  {c.inbounds && c.inbounds.length > 2 && (
-                                    <span className="text-[10px] bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 px-1.5 py-0.5 rounded font-bold">
-                                      +{c.inbounds.length - 2}
-                                    </span>
-                                  )}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950 p-2 rounded border border-zinc-200 dark:border-zinc-800">
-                                <span className="text-zinc-600 dark:text-zinc-400">{t("clients.protocolLabel")}</span>
-                                <span className="font-medium text-zinc-900 dark:text-zinc-100 uppercase flex items-center gap-1">
-                                  {c.inbounds?.length 
-                                    ? c.inbounds.slice(0, 2).map((i: any) => `${i.protocol}${i.streamSettings?.network ? ` ${i.streamSettings.network}` : ''}`).join(', ')
-                                    : `${c.inbound?.protocol || t("common.unknown")}${(c.inbound as any)?.streamSettings?.network ? ` ${(c.inbound as any).streamSettings.network}` : ''}`
-                                  }
-                                  {c.inbounds && c.inbounds.length > 2 && (
-                                    <span className="text-[10px] bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 px-1.5 py-0.5 rounded font-bold">
-                                      +{c.inbounds.length - 2}
-                                    </span>
-                                  )}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="space-y-1">
-                              <div className="text-xs text-zinc-500 uppercase font-semibold">{t("clients.trafficSpecifics")}</div>
-                              <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950 p-2 rounded border border-zinc-200 dark:border-zinc-800">
-                                <span className="text-zinc-600 dark:text-zinc-400">{t("clients.uploadLabel")}</span>
-                                <span className="font-medium text-emerald-500">{formatBytes(c.up)}</span>
-                              </div>
-                              <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950 p-2 rounded border border-zinc-200 dark:border-zinc-800">
-                                <span className="text-zinc-600 dark:text-zinc-400">{t("clients.downloadLabel")}</span>
-                                <span className="font-medium text-blue-500">{formatBytes(c.down)}</span>
-                              </div>
-                            </div>
-                            <div className="space-y-1 lg:col-span-2">
-                               <div className="text-xs text-zinc-500 uppercase font-semibold">{t("clients.subscriptionLinks")}</div>
-                               
-                               <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-2 rounded border border-zinc-200 dark:border-zinc-800">
-                                 <span className="text-zinc-500 w-[70px] whitespace-nowrap">{t("clients.systemSub")}</span>
-                                 <a 
-                                   href={typeof window !== 'undefined' ? `${window.location.origin}/s/${c.subId || c.email}` : '#'} 
-                                   target="_blank" 
-                                   className="font-mono text-xs text-blue-500 hover:underline truncate flex-1 block"
-                                   onClick={(e) => e.stopPropagation()}
-                                 >
-                                   {typeof window !== 'undefined' ? `${window.location.origin}/s/${c.subId || c.email}` : ''}
-                                 </a>
-                               </div>
-                               
-                               {c.inbound?.panel?.url && (
-                                 <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-2 rounded border border-zinc-200 dark:border-zinc-800">
-                                   <span className="text-zinc-500 w-[70px] whitespace-nowrap">{t("clients.panelSub")}</span>
-                                   {(() => {
-                                     const sub = encodeURIComponent(c.subId || c.email || '');
-                                     let link = '';
-                                     if (c.inbound.panel.subUrl) {
-                                       const base = c.inbound.panel.subUrl.endsWith('/') ? c.inbound.panel.subUrl : `${c.inbound.panel.subUrl}/`;
-                                       link = `${base}${sub}`;
-                                     } else {
-                                       try {
-                                         const parsed = new URL(c.inbound.panel.url);
-                                         link = `${parsed.origin}/sub/${sub}`;
-                                       } catch {
-                                         const base = c.inbound.panel.url.endsWith('/') ? c.inbound.panel.url : `${c.inbound.panel.url}/`;
-                                         link = `${base}sub/${sub}`;
-                                       }
-                                     }
-                                     return (
-                                       <a 
-                                         href={link} 
-                                         target="_blank" 
-                                         className="font-mono text-xs text-blue-500 hover:underline truncate flex-1 block"
-                                         onClick={(e) => e.stopPropagation()}
-                                       >
-                                         {link}
-                                       </a>
-                                     );
-                                   })()}
-                                 </div>
-                               )}
-                           </div>
-                           </div>
-                        </td>
-                      </motion.tr>
-                    )}
-                  </AnimatePresence>
-                );
-              })}
-              {clients.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-500">
-                    {t("clients.noClientsFound")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination Footer */}
-        {totalItems > 0 && (
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-zinc-200 dark:border-zinc-800 p-4 sm:flex-row bg-white dark:bg-zinc-900/10">
-            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-              <span>{t("common.show")}</span>
-              <select
-                value={limit}
-                onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
-                }}
-                className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2 py-1 text-zinc-600 dark:text-zinc-300 outline-none"
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <span>{t("common.perPage")}</span>
-              <span className="ms-4">
-                {t("common.paginationClients", {
-                  from: (page - 1) * limit + 1,
-                  to: Math.min(page * limit, totalItems),
-                  total: totalItems,
-                })}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="rounded-lg border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
-              >
-                {t("common.previous")}
-              </button>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 px-2">
-                {t("common.pageOf", { page, total: totalPages || 1 })}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className="rounded-lg border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
-              >
-                {t("common.next")}
-              </button>
-            </div>
-          </div>
-        )}
-      </Card>
-      )
+      </>
       )}
 
-        </motion.div>
-      </AnimatePresence>
+      {modern ? (
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[18.5rem_minmax(0,1fr)]">
+          {showPanelSelector || modernAccount ? (
+            <ModernClientsRail
+              destinations={showPanelSelector ? modernDestinations : []}
+              panelId={panelId}
+              onSelect={selectPanel}
+              extraSlot={showPanelSelector ? <PluginSlot name="clients.providerSelector.extra" props={{ panelId, selectPanel }} /> : null}
+              account={modernAccount}
+            />
+          ) : null}
+          <div className="min-w-0 xl:col-start-2">{clientsListBlock}</div>
+        </div>
+      ) : (
+        clientsListBlock
+      )}
+
 
       {/* Floating Bulk Actions Bar (Responsive) */}
       <AnimatePresence>

@@ -4,6 +4,8 @@
 [amir12120](https://github.com/amir12120).
 
 - Upstream project: <https://github.com/neoauroraproject/hmpanel>
+- Synced upstream release: **v3.0.1** (this build is versioned `3.0.1-hmray.N`
+  so fork builds stay distinguishable from upstream releases)
 - Upstream author: the HMPanel Team (© neoauroraproject)
 - Upstream code in this repository is marked `"license": "UNLICENSED"` and its
   README additionally mentions the MIT License; no `LICENSE` file is shipped

@@ -55,6 +55,7 @@
     "storePayg": "Pay As You Go",
     "paymentManagement": "Payment Management",
     "adminRecharge": "Admin Recharge",
+    "marketing": "Marketing",
     "monitoringPro": "Monitoring Pro",
     "backupCenter": "Backup Center",
     "jobCenter": "Job Center",
@@ -179,7 +180,9 @@
     "unreachable": "Unreachable",
     "notMounted": "Not Mounted",
     "srPrevious": "Previous",
-    "srNext": "Next"
+    "srNext": "Next",
+    "switchOn": "On",
+    "switchOff": "Off"
   },
   "login": {
     "title": "Panel Login",
@@ -192,7 +195,9 @@
     "failed": "Login failed",
     "signingIn": "Signing in…",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "welcome": "Welcome back 👋",
+    "welcomeHint": "Sign in to continue"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -327,7 +332,7 @@
     "filterNoTraffic": "No Traffic",
     "hideFilters": "Hide Filters",
     "advancedFilters": "Advanced Filters",
-    "searchExtendedPlaceholder": "Search clients by name, email or UUID…",
+    "searchExtendedPlaceholder": "Search clients by name, note, email or UUID…",
     "allAdmins": "All Admins",
     "noAdminDirect": "No Admin (Direct Panels)",
     "allPanels": "All Panels",
@@ -528,7 +533,8 @@
     "onlineSessionIp": "IP",
     "onlineSessionDevice": "Device",
     "onlineSessionHwid": "HWID",
-    "onlineSessionUser": "Client"
+    "onlineSessionUser": "Client",
+    "allGroups": "All groups"
   },
   "connection": {
     "platformQr": "Platform Sub QR",
@@ -830,7 +836,9 @@
     "colTag": "Tag",
     "colRemark": "Remark",
     "premiumUnavailable": "Premium unavailable",
-    "disconnected": "Disconnected"
+    "disconnected": "Disconnected",
+    "maxClients": "Max clients on this panel",
+    "maxClientsHint": "0 means no limit. When full, no new clients are created and the store stops offering it for new purchases; renewing existing services still works."
   },
   "traffic": {
     "title": "Traffic History",
@@ -1538,7 +1546,9 @@
     "jsonFull": "Full panel docs as JSON",
     "guide": "Full API guide",
     "premiumScopes": "Premium",
-    "docsReference": "Every route, with a copyable curl command, is listed in the reference below."
+    "docsReference": "Every route, with a copyable curl command, is listed in the reference below.",
+    "scope_marketing_read": "Marketing: view daily numbers and suggested tasks",
+    "scope_marketing_write": "Marketing: report finished tasks"
   },
   "apiDocs": {
     "title": "Endpoint reference",
@@ -1604,5 +1614,201 @@
     "ep_paygResume": "Resume a subscription",
     "ep_tplList": "Your client templates",
     "ep_tplPools": "Your client name pools"
+  },
+  "appearance": {
+    "title": "Panel look",
+    "cardHint": "Switch between the new and the classic look. No data or settings change.",
+    "styleLabel": "Style",
+    "classic": "Classic",
+    "modern": "Modern",
+    "navLabel": "Menu position",
+    "navTop": "Top",
+    "navSide": "Side",
+    "usePanelDefault": "Back to panel default",
+    "personalHint": "This choice applies to this browser only.",
+    "account": "Account",
+    "mineTitle": "Look for me",
+    "defaultTitle": "Default for everyone",
+    "defaultHint": "Admins and resellers who have not picked a look themselves see this one.",
+    "saveDefault": "Save default",
+    "defaultSaved": "Default panel look saved",
+    "premiumMenuTitle": "All Premium features",
+    "more": "More"
+  },
+  "dashboardModern": {
+    "clientsMix": "Client status",
+    "systemHealth": "System health",
+    "hostLoad": "Host node load",
+    "panelsOnline": "{online} of {total} panels online",
+    "quota": "Traffic quota",
+    "remaining": "Remaining",
+    "used": "Used"
+  },
+  "modernClients": {
+    "firstUse": "from first connection",
+    "daysShort": "days"
+  },
+  "modernAdmins": {
+    "trafficLeft": "Traffic left",
+    "usedOf": "{used} used of {total}",
+    "modeUsage": "Usage-based",
+    "modeAllocation": "Allocation",
+    "clientsCount": "{count} clients",
+    "resellers": "Resellers",
+    "assigned": "Traffic assigned",
+    "used": "Used",
+    "left": "Left"
+  },
+  "modernTraffic": {
+    "balanceTitle": "Balance movement",
+    "balanceHint": "Balance after each transaction on this page"
+  },
+  "adminTools": {
+    "quickTopUp": "Quick top-up",
+    "quickTitle": "Quick top-up for {name}",
+    "sharedPool": "Shared pool",
+    "perPanelTraffic": "Traffic per panel",
+    "remainingOf": "{left} left of {total}",
+    "addGb": "Add traffic (GB)",
+    "addGbPlaceholder": "e.g. 50 or -10",
+    "addClients": "Change client cap",
+    "clientsPlaceholder": "Current cap {now} — e.g. +20",
+    "addDays": "Extend (days)",
+    "addDaysPlaceholder": "e.g. 30",
+    "dayUnit": "d",
+    "daysAfter": "After extending: {count} days",
+    "unlimitedPanel": "This panel is unlimited",
+    "noPanels": "No panels are set up for this admin yet.",
+    "deltaHint": "Numbers are added to the current value; use a negative number to subtract. Only rows you fill in change.",
+    "apply": "Apply",
+    "applied": "Changes applied",
+    "premiumTitle": "Premium features for this admin",
+    "premiumHint": "Each feature you turn on appears in this reseller's menu. The same setting shows in Premium Settings.",
+    "premiumNone": "No Premium modules are enabled for assignment.",
+    "premiumSaved": "Access saved"
+  },
+  "adminWizard": {
+    "progress": "New admin steps",
+    "stepAccount": "Account",
+    "stepTraffic": "Traffic model",
+    "stepPanels": "Panels",
+    "stepPremium": "Premium",
+    "stepReview": "Review",
+    "next": "Next",
+    "back": "Back",
+    "stepOf": "Step {n} of {total}",
+    "togglePassword": "Show or hide password",
+    "passwordHint": "At least 8 characters.",
+    "trafficTitle": "How should this reseller's traffic work?",
+    "trafficHint": "Shared pool means one balance for every panel; per-panel means each panel has its own balance, entered next to the panel in the next step.",
+    "perPanelNext": "In the next step, enter traffic and caps next to each panel you pick.",
+    "expiryPlaceholder": "Empty = no expiry",
+    "expiryHint": "Days the reseller account stays valid, from today.",
+    "reviewRole": "Role",
+    "reviewPanelTraffic": "Panel traffic",
+    "reviewExpiry": "Account validity",
+    "reviewAccess": "Access",
+    "reviewAccessValue": "{panels} panels, {inbounds} inbounds"
+  },
+  "premiumMenu": {
+    "title": "Premium features",
+    "subtitle": "Store, bot, resellers and pro tools in one place",
+    "count": "{count} modules",
+    "settings": "Premium settings & license",
+    "desc": {
+      "store": "Sell with the bot and mini app; orders and coupons",
+      "store-digital": "Sell digital codes and accounts with auto delivery",
+      "store-payg": "Services billed from the wallet by usage",
+      "payment-management": "Cards, crypto, gateways and Telegram Stars",
+      "admin-recharge": "Sell reseller accounts and reseller top-ups",
+      "marketing": "Targeted messages, campaigns and surveys",
+      "external-panels": "Manage Eylan and Pasarguard panels",
+      "client-templates": "Ready-made templates for quick client creation",
+      "branding": "Your own logo, name and colours",
+      "themes": "Look of the customer subscription page",
+      "custom-domains": "Your own domain for store and links",
+      "domains": "Your own domain for store and links",
+      "monitoring-pro": "Live server status and alerts",
+      "monitoring": "Live server status and alerts",
+      "backup-center": "Automatic backups and restore",
+      "backups": "Automatic backups and restore",
+      "job-center": "Scheduled jobs and queues",
+      "jobs": "Scheduled jobs and queues"
+    },
+    "lockedTip": "Activate Premium to use this",
+    "lockedBadge": "Not active",
+    "lockedSubtitle": "These unlock with a Premium license",
+    "buyTitle": "Buy Premium",
+    "buyHint": "After buying, enter the license in panel settings.",
+    "buyBot": "Buy in Telegram bot",
+    "buySite": "Buy on website"
+  },
+  "navPins": {
+    "open": "Customize top menu",
+    "title": "Which pages go in the top menu?",
+    "hint": "Pick and order up to {max} pages. The rest stay under \"More\" and \"Premium\". Saved for this browser only.",
+    "inBar": "In the top menu",
+    "available": "Add to menu",
+    "empty": "No pages selected; add some from the list.",
+    "up": "Move up",
+    "down": "Move down",
+    "remove": "Remove from menu",
+    "reset": "Reset to default"
+  },
+  "clientDetails": {
+    "copied": "Link copied",
+    "copyFailed": "Copy failed; select the link by hand",
+    "open": "Open",
+    "daysLeft": "{count} days left",
+    "onlineNow": "Online now",
+    "systemLink": "System subscription link",
+    "panelLink": "Panel subscription link",
+    "qrAndConfigs": "QR & configs"
+  },
+  "whatsNew": {
+    "badge": "New version",
+    "title": "Welcome to HMPanel 3",
+    "subtitle": "Your panel was updated. These are the biggest changes:",
+    "p1Title": "Modern look",
+    "p1": "New layouts and charts with side or top navigation, light and dark. The classic look is still in Settings.",
+    "p2Title": "Your menu and the Premium menu",
+    "p2": "Pin the pages you use most and open every Premium feature from one place.",
+    "p3Title": "Redesigned sales",
+    "p3": "Store, bot, digital goods, pay-as-you-go, reseller sales and emergency top-ups.",
+    "p4Title": "Admins and clients",
+    "p4": "Step-by-step admin creation, quick per-panel top-ups and full client details with links.",
+    "premium": "If you have Premium, its bundle was updated automatically after the update. To buy: license.hmray.pro",
+    "start": "Get started",
+    "changelog": "Full changelog"
+  },
+  "portalSettings": {
+    "announceTitle": "Message inside apps",
+    "announceHint": "Shown above the service in apps that support subscription messages (such as Hiddify and v2rayNG). Used traffic, remaining traffic and expiry are always sent automatically. Leave empty for no message.",
+    "announcePlaceholder": "e.g. To renew, message @myvpn_bot"
+  },
+  "panelProxy": {
+    "title": "Reach 3x-ui panels through a proxy",
+    "hint": "If this server cannot connect to your 3x-ui panels directly (filtering, blocked IP or DNS), panel requests go through this proxy.",
+    "mode": {
+      "fallback": "Only when direct fails",
+      "always": "Always use the proxy"
+    },
+    "modeHint": {
+      "fallback": "Direct first; on a network failure, through the proxy. A panel that only works via the proxy keeps using it for 10 minutes.",
+      "always": "Every request to your panels goes through the proxy."
+    },
+    "paste": "Paste link",
+    "pasteInvalid": "Could not read this link. Example: socks5://user:pass@1.2.3.4:1080",
+    "host": "Proxy host",
+    "username": "Username (optional)",
+    "password": "Password (optional)",
+    "passwordKept": "Saved password is kept",
+    "testTitle": "Test with panel",
+    "testRun": "Test",
+    "direct": "Direct",
+    "viaProxy": "Through the proxy",
+    "failed": "No connection",
+    "saved": "Panel proxy settings saved",
+    "saveFailed": "Could not save"
   }
 }

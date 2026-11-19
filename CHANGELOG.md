@@ -8,6 +8,140 @@ All notable changes to this project will be documented in this file.
 3. Update this `CHANGELOG.md` file by adding a new section at the top for the new version.
 4. Create a GitHub Release with the new version tag (e.g., `v1.5.3`). This triggers the CI/CD pipeline to build and publish the new Docker image to GHCR.
 
+## [3.0.1] - 2026-11-19
+
+### پنل
+- **پیش‌فرض بعد از آپدیت:** ظاهر جدید با منوی کناری. ظاهر کلاسیک همچنان از منوی ظاهر قابل انتخاب است.
+- **معرفی نسخه جدید:** بنر صفحه ورود حذف شد. بعد از هر آپدیت، مدیر اصلی یک بار پنجره «چه چیزی جدید است» را بعد از ورود می‌بیند.
+- صفحه ورود ساده‌تر و نسخه پنل پایین آن نمایش داده می‌شود.
+- **جزئیات کلاینت بازطراحی شد:** مصرف، انقضا با روزهای باقیمانده، پنل، اینباندها و لینک‌های اشتراک با کپی، باز کردن و QR.
+- **اتصال به پنل‌های ثنایی از طریق پروکسی:** اگر سرور نتواند مستقیم به 3x-ui وصل شود، درخواست‌ها از پروکسی SOCKS5 یا HTTP عبور می‌کنند. حالت «فقط وقتی مستقیم نشد» یا «همیشه»، با چسباندن لینک و تست با یک پنل (تنظیمات ← عمومی).
+- **ظرفیت هر پنل:** حداکثر تعداد کلاینت برای هر پنل. وقتی پر شود کلاینت جدید ساخته نمی‌شود و فروشگاه آن را برای خرید جدید نشان نمی‌دهد؛ تمدید سرویس‌های فعلی کار می‌کند.
+- **گروه‌ها:** گروه کلاینت‌ها حالا در خود پنل هم ذخیره می‌شود، روی همه نوع پنل کار می‌کند و فیلتر «گروه» در لیست کلاینت‌ها اضافه شد. گروه ثنایی همچنان در صورت پشتیبانی همگام می‌شود.
+- **پیام روی لینک ساب:** متنی که در تنظیمات پورتال می‌نویسید در برنامه‌های کلاینت نمایش داده می‌شود.
+- پنجره ظاهر در منوی کناری دیگر بیرون از صفحه باز نمی‌شود.
+- **آپدیت خودکار پرمیوم:** بعد از آپدیت پنل، اگر لایسنس فعال باشد باندل پرمیوم هم خودکار به‌روز می‌شود و `update.sh` نتیجه را نشان می‌دهد.
+
+### فروشگاه و ربات (پرمیوم)
+- **شارژ اضطراری** در صفحه ساب همه قالب‌ها نمایش داده می‌شود و فقط برای سرویس‌های خریداری‌شده (نه تست). شارژهای اضطراری اخیر حالا یک تب جدا در فروشگاه دارند.
+- **قوانین سرویس** (فروشگاه ← تنظیمات ← قوانین سرویس):
+  - **نحوه تمدید:** اضافه شدن به باقیمانده، شروع دوره از نو، یا **رزرو** تا وقتی سرویس فعلی تمام شود و بعد خودکار شروع شود.
+  - **نام کاربری سرویس‌های جدید:** از نام تلگرام، پیشوند + شماره، یا پیشوند + کد تصادفی؛ تکراری بودن همیشه بررسی می‌شود.
+  - **خرید حجم یا زمان اضافه** از صفحه سرویس در ربات، با پرداخت از کیف پول.
+  - **پلن دلخواه:** مشتری حجم و مدت را در محدوده‌ای که تعیین می‌کنید انتخاب می‌کند و قیمت خودکار حساب می‌شود.
+  - **تیکت پشتیبانی:** مشتری از ربات پیام می‌فرستد و ادمین با Reply در چت ادمین جواب می‌دهد.
+- **لیست قیمت** و **آموزش‌ها** به‌عنوان دکمه‌های منوی ربات؛ متن صفحه پشتیبانی (مثلاً آیدی پشتیبان) قابل تنظیم است.
+- پنل‌های پر در خرید جدید ربات و فروشگاه وب نمایش داده نمی‌شوند.
+- **پروکسی ربات تلگرام:** چسباندن لینک پروکسی و تست هم‌زمان مسیر مستقیم و پروکسی.
+
+### Panel
+- **Default after updating:** the new look with the side menu. The classic look is still available from the appearance menu.
+- **What's new:** the login banner is gone. After each update, the main admin sees a "What's new" window once after logging in.
+- Simpler login page that shows the panel version.
+- **Redesigned client details:** usage, expiry with days left, panel, inbounds and subscription links with copy, open and QR.
+- **Reach 3x-ui panels through a proxy:** when this server cannot connect to a panel directly, requests go through a SOCKS5 or HTTP proxy, either only when direct fails or always. Paste a link and test it against a panel (Settings → General).
+- **Panel capacity:** a maximum number of clients per panel. When full, no new clients are created and the store stops offering it for new purchases; renewals keep working.
+- **Groups:** client groups are now also stored in the panel, work on every panel type, and the client list has a group filter. The 3x-ui group still syncs where supported.
+- **Subscription message:** text set in the portal settings shows in client apps.
+- The appearance window in the side menu no longer opens off screen.
+- **Premium auto-update:** after a panel update, an active license also updates the Premium bundle, and `update.sh` reports the result.
+
+### Store and bot (Premium)
+- **Emergency recharge** shows on the subscription page in every theme, only for purchased (not test) services. Recent emergency recharges have their own Store tab.
+- **Service rules** (Store → Settings → Service rules):
+  - **How renewals apply:** add to what is left, start a fresh period, or **reserve** until the current service runs out and then start automatically.
+  - **Names for new services:** from the Telegram name, prefix + number, or prefix + random code; uniqueness is always checked.
+  - **Buy extra volume or time** from the service page in the bot, paid from the wallet.
+  - **Custom plan:** customers pick volume and duration within your limits and the price is calculated.
+  - **Support tickets:** customers message support from the bot and admins answer by replying in the admin chat.
+- **Price list** and **Tutorials** as bot menu buttons; the support page text (e.g. your support account) is configurable.
+- Full panels are left out of new purchases in the bot and the web store.
+- **Telegram bot proxy:** paste a proxy link and test the direct and proxy routes side by side.
+
+## [3.0.0] - 2026-11-18
+
+### ظاهر جدید (قابل انتخاب)
+- **ظاهر مدرن برای کل پنل و ماژول‌های پرمیوم.** داشبورد، کلاینت‌ها، ادمین‌ها، پنل‌ها، تاریخچه ترافیک و صفحه‌های پرمیوم ساختار، نمودار و چیدمان تازه دارند. منو بالا یا کناری قابل انتخاب است. ظاهر قبلی پیش‌فرض می‌ماند؛ مدیر کل می‌تواند پیش‌فرض کل پنل را عوض کند و هر کاربر هم ظاهر خودش را انتخاب می‌کند.
+- همه کلیدهای روشن/خاموش حالا سوییچ واضح با متن «روشن/خاموش» هستند.
+- **منوی پرمیوم:** دکمه طلایی جدا در منوی بالا که با رفتن موس روی آن، مگامنوی همه ماژول‌های پرمیوم باز می‌شود. بدون لایسنس، ماژول‌ها قفل‌شده نمایش داده می‌شوند و دکمه خرید از ربات و سایت دارد.
+- **شخصی‌سازی منوی بالا:** هر کاربر انتخاب می‌کند کدام صفحه‌ها (تا ۷ تا) و به چه ترتیبی در منوی بالا باشند. با پرمیوم فعال، فروشگاه و افزایش اعتبار به‌طور پیش‌فرض بالا هستند.
+
+### ادمین‌ها
+- ساخت ادمین به‌صورت مرحله‌به‌مرحله؛ نوع حجم (کلی یا جدا برای هر پنل) همان اول انتخاب می‌شود.
+- **شارژ سریع:** افزایش حجم هر پنل، ظرفیت کاربر و روز از یک پنجره، بدون رفتن به تب دسترسی‌ها.
+- دسترسی ماژول‌های پرمیوم هر ادمین از همان صفحه ادمین‌ها تنظیم می‌شود.
+
+### فروشگاه و ربات (پرمیوم)
+- **رفع ارسال تکراری سفارش:** هر سفارش جدید فقط یک پیام در ربات ادمین می‌سازد و به‌روزرسانی‌ها همان پیام را ویرایش می‌کنند (قبلاً تا ۳ بار می‌آمد).
+- کد تخفیف در سفارش و پیام ربات نمایش داده می‌شود؛ بخش کد تخفیف بازطراحی شد (محدوده واضح، تاریخچه استفاده، فعال/غیرفعال). رفع خطایی که با ذخیره دوباره، کد محدود را برای کل فروشگاه باز می‌کرد.
+- ربات: خلاصه قیمت خواناتر، دکمه بازگشت در همه مراحل، خطاهای کد تخفیف به فارسی، جستجوی سفارش و تنظیمات سریع برای ادمین.
+- **محصولات دیجیتال:** نمای کلی موجودی و فروش، هشدار کمبود موجودی، کارت محصول با روشن/خاموش، کپی و حذف، و ساخت گروهی پک‌های تلگرام استارز از روی قیمت ۱۰۰ استارز.
+- **نرخ استارز:** به‌جای «استار به ازای هر تومان»، قیمت ۱۰۰ استارز را وارد می‌کنید و قیمت هر استار و مثال حساب می‌شود.
+- **پرداخت به‌ازای مصرف:** داشبورد جدید (درآمد ۳۰ روز، پردرآمدترین سرویس‌ها، مشتری‌های رو به اتمام موجودی) و فیلتر وضعیت‌ها. مشتری می‌تواند سرویسش را از ربات کامل حذف کند و ادمین هم از پنل؛ کانفیگ از پنل هم پاک می‌شود. با تمام شدن موجودی سرویس فقط غیرفعال می‌شود.
+- **نمایندگی:** صفحه راه‌اندازی فروش نمایندگی با چک‌لیست و پیش‌نمایش پیشنهاد. رفع شارژ نمایندگان با حجم جدا برای هر پنل که در بعضی پلن‌ها حجم را اضافه نمی‌کرد، و جلوگیری از دو بار تمدید هنگام تلاش مجدد.
+- شارژ اضطراری برای مشتری‌هایی که حجم یا زمانشان تمام شده، و ویجت‌های ربات (نمودار مصرف، پیگیری سفارش).
+
+### نصب و حذف
+- **حذف کامل پنل از سرور:** حذف‌کننده دیگر سرویس systemd، کانتینرها، والیوم‌ها، شبکه، ایمیج‌ها و فایل‌های موقت را جا نمی‌گذارد؛ نصب دوباره بدون خطا انجام می‌شود. نصب‌کننده کانتینرهای باقی‌مانده از نصب قبلی را هم پاک می‌کند.
+- اطلاعات دستگاه (سیستم‌عامل، نام میزبان) هنگام فعال‌سازی لایسنس ارسال می‌شود تا در پنل لایسنس قابل شناسایی باشد.
+
+### New look (optional)
+- **Modern UI for the whole panel and the Premium modules**, with new structure, charts and layouts. Top or side navigation. The classic look stays the default; the super admin sets the panel-wide default and each user can pick their own.
+- Every on/off control is now a clear switch with an On/Off label.
+- **Premium menu:** a separate gold button in the top bar opens a mega menu of every Premium module on hover. Without a license the modules show locked, with buttons to buy in the Telegram bot or on the website.
+- **Customizable top menu:** each user picks which pages (up to 7) sit in the top bar and in what order. With Premium active, Store and Reseller sales are pinned by default.
+
+### Admins
+- New admin creation is a step-by-step wizard; shared or per-panel traffic is chosen first.
+- **Quick top-up:** add per-panel GB, client capacity and days from one dialog.
+- Premium module access per admin is managed on the Admins page.
+
+### Store and bot (Premium)
+- **Fixed duplicate order notifications:** a new order now creates one admin message and later updates edit it (it used to arrive up to 3 times).
+- Orders and bot messages show the coupon used. The coupon section is redesigned (explicit scope, usage history, enable/disable). Fixed a bug where re-saving a limited coupon opened it to the whole store.
+- Bot: clearer price summary, back buttons on every step, Persian coupon errors, order search and quick settings for admins.
+- **Digital goods:** stock and sales overview, low-stock warnings, product cards with on/off, duplicate and delete, and bulk creation of Telegram Stars packs from the price of 100 stars.
+- **Stars rate:** enter the price of 100 stars instead of "stars per toman"; the per-star price and an example are shown.
+- **Pay-as-you-go:** new dashboard (30-day revenue, top services, customers about to run out) and state filters. Customers can delete their service from the bot and admins from the panel; the config is removed from the panel too. An empty wallet only disables the service.
+- **Resellers:** setup hub with a checklist and an offer preview. Fixed per-panel reseller top-ups that dropped the plan's traffic in some cases, and retries that extended the expiry twice.
+- Emergency recharge for customers who ran out of traffic or time, and bot widgets (usage chart, order tracker).
+
+### Install and uninstall
+- **Uninstall now removes everything it should:** the systemd service, containers, volumes, network, images and temp files, so reinstalling works. The installer also clears containers left by an earlier install.
+- License activation sends device info (OS, hostname) so the license panel can label each device.
+
+## [2.5.23] - 2026-11-11
+
+### رفع اشکال
+- **خطای Internal error در ساخت عمده کلاینت.** با حجم اعشاری مثل ۰.۲ گیگ (۲۰۰ مگ)، ساخت عمده از صفحه کلاینت‌ها خطا می‌داد. حالا حجم و زمان قبل از ذخیره به عدد صحیح گرد می‌شوند؛ همین اصلاح در ساخت تکی، ویرایش و افزایش روز به‌صورت گروهی هم اعمال شد.
+- **پشتیبانی از ثنایی (3x-ui) نسخه 3.11.** مرجع API حالا `docs/api311.json` است. قبلاً نام فایل‌های `api310`/`api311` اشتباه به‌صورت 3.1.x خوانده می‌شد و پنل‌های 3.10 و 3.11 با مشخصات 3.9 شناسایی می‌شدند.
+- خطای 404 در تست اتصال دیگر «پنل 3x-ui نیست» نمی‌گوید؛ حالا توضیح می‌دهد که مسیر پایه (web base path) یا پورت پنل در آدرس اشتباه است یا جا افتاده.
+
+### Fixed
+- **Bulk client creation no longer fails with an internal error** for fractional sizes such as 0.2 GB. Byte and time values are rounded before they are stored; the same fix covers single create, edit and bulk extend by days.
+- **3x-ui 3.11 support.** `docs/api311.json` is now the reference spec. Spec files `api310`/`api311` were parsed as 3.1.x, so 3.10/3.11 panels resolved against the 3.9 spec.
+- A 404 from the connection test no longer says "not a 3x-ui panel". 3x-ui returns 404 for unknown routes (a bad token gets 401 since 3.11), so the message now points at a missing web base path or wrong port.
+
+## [2.5.22] - 2026-11-09
+
+### بهبود
+- جستجوی کلاینت‌ها حالا علاوه بر نام و ایمیل، در یادداشت، نام کاربری پنل مقصد و UUID هم جستجو می‌کند.
+
+### Improved
+- Client search now also matches notes, the provider username and the UUID, not only the name/email.
+
+## [2.5.21] - 2026-11-09
+
+### افزوده شد
+- **زیرساخت ماژول مارکتینگ.** جدول‌های ورود از لینک‌های ردیابی، رویدادهای چرخه عمر مشتری، سفرهای پیام خودکار، نظرسنجی‌ها، صف محتوا و کمپین‌ها، و تعریف ماژول `marketing` (وابسته به فروشگاه). خود ماژول همراه پریمیوم ۲.۵.۲۴ عرضه می‌شود و به پلن لایسنسی نیاز دارد که آن را شامل شود.
+- کتابخانه رسمی Claude (`@anthropic-ai/sdk`) برای پیش‌نویس محتوای هوشمند در ماژول مارکتینگ.
+- دسترسی‌های جدید کلید API: `marketing.read` و `marketing.write` برای اپ دسکتاپ.
+
+### Added
+- **Marketing module groundwork.** Tables for tracked link arrivals, customer lifecycle events, automated message journeys, surveys, the content queue and campaigns, plus the `marketing` module definition (depends on Store). The module itself ships with Premium 2.5.24 and needs a license plan that includes it.
+- The official Claude SDK (`@anthropic-ai/sdk`) for AI content drafts in the marketing module.
+- New API key scopes `marketing.read` and `marketing.write` for the desktop app.
+
 ## [2.5.20] - 2026-11-03
 
 ### رفع مشکل

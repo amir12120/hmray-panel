@@ -5,13 +5,16 @@ import {
   Inject,
   HttpException,
   HttpStatus,
+  OnApplicationBootstrap,
 } from '@nestjs/common';
+import { getAppVersion } from '../common/utils/app-version';
 import * as fs from 'fs';
 import { SettingsService } from '../settings/settings.service';
 import { InstanceFingerprintService } from './instance-fingerprint.service';
 import { PremiumBundleService } from './premium-bundle.service';
 import { LICENSE_LEASE_KEY, LicenseManagerService } from './license-manager.service';
 import { verifyEntitlementLease } from './license-lease.util';
+import { getLicenseDeviceInfo } from './license-device-info.util';
 import { PluginsService } from '../plugins/plugins.service';
 import type { LicenseState } from './types/module-manifest.types';
 import {
@@ -49,8 +52,11 @@ export interface ActivateResult {
   message?: string;
 }
 
+/** SystemSetting: panel version for which the post-update bundle check already ran. */
+const AUTO_BUNDLE_CHECKED_KEY = 'premium_bundle_autocheck_version';
+
 @Injectable()
-export class LicenseActivationService {
+export class LicenseActivationService implements OnApplicationBootstrap {
   private readonly logger = new Logger(LicenseActivationService.name);
 
   constructor(
@@ -61,6 +67,56 @@ export class LicenseActivationService {
     @Inject(forwardRef(() => PluginsService))
     private pluginsService: PluginsService,
   ) {}
+
+  /**
+   * After a panel update (first boot on a new panel version) a licensed panel fetches the
+   * latest Premium bundle by itself, so `hm update` leaves panel and bundle in step.
+   * Runs once per panel version: if a newer bundle is installed the backend restarts to
+   * load it, and the marker stops the next boot from checking again.
+   * Opt out with PREMIUM_AUTO_UPDATE=0.
+   */
+  onApplicationBootstrap() {
+    if (process.env.PREMIUM_AUTO_UPDATE === '0') return;
+    const delayMs = Number(process.env.PREMIUM_AUTO_UPDATE_DELAY_MS || 20_000);
+    setTimeout(() => {
+      this.autoUpdateBundleAfterPanelUpdate().catch((err) =>
+        this.logger.warn(`Premium auto-update skipped: ${err?.message || err}`),
+      );
+    }, delayMs).unref?.();
+  }
+
+  async autoUpdateBundleAfterPanelUpdate(): Promise<'skipped' | 'current' | 'updated' | 'failed'> {
+    const panelVersion = getAppVersion();
+    const checked = await this.settingsService.getSetting(AUTO_BUNDLE_CHECKED_KEY, '');
+    if (checked === panelVersion) return 'skipped';
+
+    const licenseKey = await this.settingsService.getSetting(LICENSE_KEY_KEY);
+    const state = await this.licenseManager.getLicenseState();
+    if (!licenseKey || (state.status !== 'active' && state.status !== 'grace')) {
+      // Nothing to fetch now; check again only after the next panel update or activation.
+      await this.settingsService.setSetting(AUTO_BUNDLE_CHECKED_KEY, panelVersion);
+      return 'skipped';
+    }
+
+    // Mark first: a successful update restarts the process, and a broken bundle server
+    // must not turn into a restart loop. The button in Settings still works any time.
+    await this.settingsService.setSetting(AUTO_BUNDLE_CHECKED_KEY, panelVersion);
+    try {
+      this.logger.log(`Panel ${panelVersion}: checking for a newer Premium bundle…`);
+      const result = await this.updateBundle();
+      if (result.bundleSkipped) {
+        this.logger.log(`Premium auto-update: bundle ${result.bundleVersion} is already current.`);
+        return 'current';
+      }
+      this.logger.log(`Premium auto-update: installed bundle ${result.bundleVersion}; restarting to load it.`);
+      return 'updated';
+    } catch (err: any) {
+      this.logger.warn(
+        `Premium auto-update failed (${err?.message || err}). Use Settings → Premium License → Update premium bundle.`,
+      );
+      return 'failed';
+    }
+  }
 
   getLicenseServerUrl(): string {
     return getPrimaryLicenseServerUrl();
@@ -118,6 +174,7 @@ export class LicenseActivationService {
         clientIp,
         panelVersion,
         productSlug: process.env.LICENSE_PRODUCT_ID || 'hmpanel',
+        ...getLicenseDeviceInfo(),
       }),
     });
 
@@ -410,6 +467,7 @@ export class LicenseActivationService {
         instanceId,
         clientIp,
         ...(version ? { version } : {}),
+        ...getLicenseDeviceInfo(),
       }),
     });
   }
@@ -439,6 +497,7 @@ export class LicenseActivationService {
         clientIp,
         panelVersion,
         productSlug: process.env.LICENSE_PRODUCT_ID || 'hmpanel',
+        ...getLicenseDeviceInfo(),
       }),
     });
 
@@ -651,7 +710,7 @@ export class LicenseActivationService {
       const { res, data, usedUrl } = await requestLicenseServer('/v1/panel/bundle-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ licenseKey, instanceId, version, clientIp }),
+        body: JSON.stringify({ licenseKey, instanceId, version, clientIp, ...getLicenseDeviceInfo() }),
       });
       push('bundle_url_request', res.ok, {
         status: res.status,

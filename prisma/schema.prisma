@@ -32,6 +32,9 @@ model Panel {
   name            String
   url             String
   subUrl          String? // Custom domain/URL for subscription links
+  /// Most clients this panel may hold (0 = no limit). New clients are refused and the
+  /// store stops selling it when full; renewals of existing clients still work.
+  maxClients      Int       @default(0)
   version         String? // Reported Xray/panel version (from the node, simulated in demo)
   apiToken        String? // Bearer token for 3x-ui API Token Based Auth
   username        String? // Fallback: username/password auth
@@ -674,6 +677,8 @@ model StoreProfile {
   loyaltyApplyRenewals    Boolean @default(true)
   loyaltyApplyNewPurchases Boolean @default(false)
   telegramBotMenu     Json?
+  /// Premium: Bot API 10.4 message widgets (live usage chart, order tracker).
+  telegramWidgetsEnabled Boolean @default(true)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -1022,6 +1027,11 @@ model StoreCustomer {
   cancelRequests StoreServiceCancelRequest[]
   referralRewardGrants StoreReferralRewardGrant[]
   paygSubscriptions PaygSubscription[]
+  marketingTouches  MarketingTouch[]
+  marketingEvents   MarketingEvent[]
+  marketingRuns     MarketingJourneyRun[]
+  marketingMessages MarketingMessage[]
+  marketingAnswers  MarketingSurveyAnswer[]
 
   @@unique([adminId, telegramUserId])
   @@index([adminId])
@@ -1375,6 +1385,34 @@ model StoreIpLimit {
   admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
   @@index([adminId])
+}
+
+/// Premium emergency recharge settings per admin (created by ensure-premium-schema; keep in sync).
+model StoreEmergencyConfig {
+  adminId   String   @id
+  config    Json     @default("{}")
+  updatedAt DateTime @default(now())
+}
+
+/// One emergency recharge taken by a customer. DEDUCT_NEXT grants are paid back on renewal.
+model StoreEmergencyGrant {
+  id             String    @id
+  adminId        String
+  clientId       String
+  customerId     String?
+  bytes          BigInt    @default(0)
+  days           Int       @default(0)
+  mode           String
+  amount         Float     @default(0)
+  currency       String?
+  source         String    @default("bot")
+  settled        Boolean   @default(false)
+  settledOrderId String?
+  settledAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([clientId, settled])
+  @@index([adminId, createdAt])
 }
 
 model StoreCouponRedemption {
@@ -2008,4 +2046,188 @@ model PolicyReservation {
 
   @@index([adminId, status])
   @@index([createdAt])
+}
+
+// ---------------------------------------------------------
+// Marketing (Premium module "marketing")
+// ---------------------------------------------------------
+
+/// One arrival through a tagged link (t.me/bot?start=<source>).
+model MarketingTouch {
+  id         String   @id @default(uuid())
+  adminId    String
+  customerId String
+  /// Normalized source, e.g. insta, site, ch_post123, abroad, ref
+  source     String
+  /// Raw start argument as Telegram delivered it
+  raw        String?
+  /// True when this touch created the customer (first contact)
+  firstTouch Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  customer StoreCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+  @@index([customerId, createdAt])
+  @@index([adminId, source])
+}
+
+/// Lifecycle moments the store does not record itself (trial ended, expiring, expired, usage 80%).
+model MarketingEvent {
+  id         String   @id @default(uuid())
+  adminId    String
+  customerId String
+  /// trial.ended | subscription.expiring | subscription.expired | usage.high
+  type       String
+  /// What the event is about (order or client id plus the threshold), so a moment is recorded once
+  refKey     String
+  orderId    String?
+  clientId   String?
+  metadata   Json?    @default("{}")
+  createdAt  DateTime @default(now())
+
+  customer StoreCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, type, refKey])
+  @@index([adminId, type, createdAt])
+}
+
+/// An automated message sequence: trigger events, then timed steps (see marketing-journey.defaults.ts).
+model MarketingJourney {
+  id        String   @id @default(uuid())
+  adminId   String
+  /// welcome | trial_to_purchase | renewal | winback | post_purchase
+  key       String
+  enabled   Boolean  @default(true)
+  /// Event types that start a run, e.g. ["trial.ended"]
+  triggers  Json     @default("[]")
+  /// Ordered steps: delay, condition, message variants, optional coupon or survey
+  steps     Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  runs MarketingJourneyRun[]
+
+  @@unique([adminId, key])
+}
+
+/// One customer going through one journey, started by one event.
+model MarketingJourneyRun {
+  id         String    @id @default(uuid())
+  adminId    String
+  journeyId  String
+  customerId String
+  /// The MarketingEvent that started it
+  eventId    String
+  /// Order or client the event was about, for buttons like one-tap renew
+  clientId   String?
+  stepIndex  Int       @default(0)
+  /// When the current step was meant to go out; quiet hours and the promo cap move only nextAt
+  dueAt      DateTime?
+  nextAt     DateTime?
+  /// active | done | converted | stopped
+  status     String    @default("active")
+  startedAt  DateTime
+  updatedAt  DateTime  @updatedAt
+
+  journey  MarketingJourney @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  customer StoreCustomer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([journeyId, eventId])
+  @@index([status, nextAt])
+  @@index([adminId, customerId])
+}
+
+/// Every message a journey sent or held back, for the promo cap and A/B results.
+model MarketingMessage {
+  id         String   @id @default(uuid())
+  adminId    String
+  customerId String
+  runId      String?
+  journeyKey String
+  stepId     String
+  variantId  String
+  promo      Boolean  @default(false)
+  couponCode String?
+  /// sent | skipped | failed
+  status     String
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  customer StoreCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, customerId, createdAt])
+  @@index([adminId, journeyKey, stepId])
+}
+
+/// Answers to bot surveys (satisfaction 1-5, why a trial did not buy).
+model MarketingSurveyAnswer {
+  id         String   @id @default(uuid())
+  adminId    String
+  customerId String
+  runId      String?
+  /// satisfaction | why_not_buy
+  kind       String
+  value      String
+  createdAt  DateTime @default(now())
+
+  customer StoreCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, kind])
+  @@index([adminId, kind, createdAt])
+}
+
+/// A post or note made by hand or drafted by AI: draft -> approved -> published.
+model MarketingContentItem {
+  id                String    @id @default(uuid())
+  adminId           String
+  /// telegram (published by the panel) | instagram (manual pack) | note (calendar, review, article)
+  channel           String
+  /// post | calendar | poll | review | article | outage
+  kind              String    @default("post")
+  /// draft | approved | published | failed
+  status            String    @default("draft")
+  title             String?
+  caption           String
+  buttonText        String?
+  /// Source tag for the button's tracked link (t.me/bot?start=<source>)
+  buttonSource      String?
+  /// data: URL of an attached image, if any
+  imageDataUrl      String?
+  hashtags          String?
+  /// Structured extra output (slides, stories, poll options, review lists)
+  extra             Json?     @default("{}")
+  campaignId        String?
+  scheduledAt       DateTime?
+  publishedAt       DateTime?
+  telegramMessageId Int?
+  error             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  campaign MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([adminId, status, scheduledAt])
+  @@index([adminId, createdAt])
+}
+
+/// A named push: period, audience, coupon and a tracked link, reported together.
+model MarketingCampaign {
+  id         String   @id @default(uuid())
+  adminId    String
+  name       String
+  /// Tracked link source, e.g. yalda1405
+  source     String
+  startsAt   DateTime
+  endsAt     DateTime
+  /// Broadcast audience, e.g. all or mk:expiring_7d
+  audience   String?
+  couponCode String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  content MarketingContentItem[]
+
+  @@index([adminId, startsAt])
 }

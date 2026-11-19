@@ -15,6 +15,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MOTION_CONFIG } from "@/lib/motion";
 import { NodeInboundBadge } from "@/components/NodeInboundBadge";
 import { PluginSlot } from "@/components/PluginSlot";
+import { useUiStyle } from "@/store/uiStyle";
+import { ModernPanelsView } from "./ModernPanelsView";
 
 interface PanelForm {
   name: string;
@@ -29,6 +31,7 @@ function isNativePanelType(type?: string | null) {
 
 export default function PanelsPage() {
   const t = useT();
+  const { modern } = useUiStyle();
   const qc = useQueryClient();
   const toast = useToast((s) => s.push);
 
@@ -98,8 +101,34 @@ export default function PanelsPage() {
   if (error) return <ErrorBox message={t("panels.loadFailed")} />;
   const panels = (data ?? []).filter((p) => !isNativePanelType(p.panelType));
 
+  const testConnection = async (p: any) => {
+    try {
+      const { data: r } = await api.post("/panels/test-connection", { url: p.url, panelId: p.id });
+      if (r.ok) toast(t("panels.testOk", { version: r.version, ping: r.pingMs ?? r.latencyMs }));
+      else toast(r.message || r.errorType || r.error || t("common.connectionFailed"), "error");
+    } catch { toast(t("common.connectionFailed"), "error"); }
+  };
+
   return (
     <motion.div {...MOTION_CONFIG.page}>
+      {modern ? (
+        <ModernPanelsView
+          panels={panels}
+          syncStatus={syncStatus}
+          onAdd={() => setWizardOpen(true)}
+          onTest={testConnection}
+          onSync={(p) => !syncStatus[p.id] && p.operable !== false && sync.mutate(p.id)}
+          onRestart={(p) => restart.mutate(p.id)}
+          onVolumes={setVolumesFor}
+          onInbounds={setInboundsFor}
+          onLogs={setLogsFor}
+          onEdit={setEditing}
+          onDelete={(p) => {
+            if (confirm(t("panels.deleteConfirm", { name: p.name }))) remove.mutate(p.id);
+          }}
+        />
+      ) : (
+      <>
       <PageHeader
         title={t("panels.title")}
         subtitle={t(panels.length === 1 ? "panels.subtitle" : "panels.subtitle_plural", { count: panels.length })}
@@ -236,6 +265,8 @@ export default function PanelsPage() {
           </tbody>
         </table>
       </Card>
+      </>
+      )}
 
       <AnimatePresence>
         {wizardOpen && <PanelWizard onClose={() => setWizardOpen(false)} onSaved={() => { invalidate(); }} />}
@@ -673,12 +704,13 @@ function EditPanel({ panel, onClose, onSaved }: { panel: any; onClose: () => voi
     status: panel.status,
     apiToken: "",
     description: panel.description || "",
+    maxClients: String(panel.maxClients ?? 0),
   });
   const update = useMutation({
     mutationFn: async () => {
       const payload: any = native
-        ? { name: form.name, description: form.description }
-        : { name: form.name, url: form.url, subUrl: form.subUrl, status: form.status, description: form.description };
+        ? { name: form.name, description: form.description, maxClients: Number(form.maxClients) || 0 }
+        : { name: form.name, url: form.url, subUrl: form.subUrl, status: form.status, description: form.description, maxClients: Number(form.maxClients) || 0 };
       if (!native && form.apiToken) payload.apiToken = form.apiToken;
       return (await api.patch(`/panels/${panel.id}`, payload)).data;
     },
@@ -704,6 +736,10 @@ function EditPanel({ panel, onClose, onSaved }: { panel: any; onClose: () => voi
                 placeholder={t("panels.catalogIntroPlaceholder")}
               />
             </label>
+            <div>
+          <Field ltr label={t("panels.maxClients")} type="number" value={form.maxClients} onChange={(e) => setForm({ ...form, maxClients: e.target.value })} />
+          <div className="text-[10px] text-zinc-500 mt-1 ps-1 leading-tight">{t("panels.maxClientsHint")}</div>
+        </div>
             <div className="flex justify-end gap-2 border-t border-zinc-200 dark:border-zinc-800 pt-4 mt-4">
               <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200">{t("common.cancel")}</button>
               <motion.button
@@ -738,6 +774,10 @@ function EditPanel({ panel, onClose, onSaved }: { panel: any; onClose: () => voi
           </div>
         </div>
         <Field ltr label={t("panels.apiToken")} type="password" value={form.apiToken} placeholder={t("panels.apiTokenKeep")} onChange={(e) => setForm({ ...form, apiToken: e.target.value })} />
+        <div>
+          <Field ltr label={t("panels.maxClients")} type="number" value={form.maxClients} onChange={(e) => setForm({ ...form, maxClients: e.target.value })} />
+          <div className="text-[10px] text-zinc-500 mt-1 ps-1 leading-tight">{t("panels.maxClientsHint")}</div>
+        </div>
         <div>
           <label className="mb-1 block text-sm text-zinc-500 dark:text-zinc-400">{t("panels.status")}</label>
           <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}

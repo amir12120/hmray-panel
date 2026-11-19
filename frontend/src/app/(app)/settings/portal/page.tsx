@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Save, Image as ImageIcon, Palette, Layout, Link as LinkIcon, MessageCircle, Phone, Globe, Mail, QrCode } from "lucide-react";
+import { Save, Image as ImageIcon, Palette, Layout, Link as LinkIcon, MessageCircle, Phone, Globe, Mail, QrCode, Megaphone } from "lucide-react";
 import { api } from "@/lib/api";
 import { Card, PageHeader, Spinner, ErrorBox } from "@/components/ui";
 import { useToast } from "@/components/toast";
@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/store/auth";
 import { useT } from "@/i18n";
 import { normalizeTelegramLink } from "@/lib/telegram-link";
+import { SwitchInput } from "@/components/SwitchInput";
 
 const THEMES = [
   { id: "Dark", label: "Dark Mode" },
@@ -21,6 +22,8 @@ const defaultSettings = {
   showWhatsApp: false, whatsappLink: "",
   showWebsite: false, websiteUrl: "",
   showEmail: false, emailAddress: "",
+  // Message shown inside VPN apps that read the subscription "announce" header
+  subAnnounce: "",
   // Branding
   portalName: "",
   logoUrl: "",
@@ -164,6 +167,24 @@ export default function ResellerSettingsPage() {
           </div>
         </Card>
 
+        <Card className="p-6 md:col-span-2 space-y-3">
+          <div className="flex items-center gap-2">
+            <Megaphone size={18} className="text-blue-500" aria-hidden />
+            <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t("portalSettings.announceTitle")}</h3>
+          </div>
+          <p className="text-sm text-zinc-500">{t("portalSettings.announceHint")}</p>
+          <textarea
+            rows={3}
+            maxLength={400}
+            dir="auto"
+            value={String(form.subAnnounce ?? "")}
+            onChange={(e) => setForm((f) => ({ ...f, subAnnounce: e.target.value }))}
+            placeholder={t("portalSettings.announcePlaceholder")}
+            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-950"
+          />
+          <div className="text-end text-xs tabular-nums text-zinc-400">{String(form.subAnnounce ?? "").length}/400</div>
+        </Card>
+
       </div>
     </div>
   );
@@ -172,14 +193,11 @@ export default function ResellerSettingsPage() {
 function Toggle({ label, checked, onChange, desc }: { label: string, checked: boolean, onChange: (v: boolean) => void, desc?: string }) {
   return (
     <label className="flex items-start gap-3 cursor-pointer group">
-      <div className={`mt-0.5 w-10 h-5 rounded-full transition-colors relative ${checked ? "bg-blue-600" : "bg-zinc-700"}`}>
-        <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${checked ? "translate-x-5" : "translate-x-0"}`} />
-      </div>
+      <SwitchInput checked={checked} onChange={e => onChange(e.target.checked)} style={{ marginTop: 2 }} />
       <div>
-        <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200 group-hover:text-white transition-colors">{label}</div>
+        <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200 transition-colors">{label}</div>
         {desc && <div className="text-xs text-zinc-500 mt-0.5">{desc}</div>}
       </div>
-      <input type="checkbox" className="hidden" checked={checked} onChange={e => onChange(e.target.checked)} />
     </label>
   );
 }
@@ -188,7 +206,7 @@ function SupportRow({ icon, title, checked, onCheck, value, onChange, onBlur, pl
   return (
     <div className="flex gap-4 items-start bg-white dark:bg-zinc-900/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
       <label className="flex items-center gap-3 cursor-pointer mt-2">
-        <input type="checkbox" checked={checked} onChange={e => onCheck(e.target.checked)} className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-blue-500 focus:ring-blue-500 focus:ring-offset-zinc-900" />
+        <SwitchInput checked={checked} onChange={e => onCheck(e.target.checked)} />
         <div className="p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg">{icon}</div>
       </label>
       <div className="flex-1 space-y-1">

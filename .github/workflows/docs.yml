@@ -28,6 +28,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Forks often have Pages disabled, and `deploy-pages` then fails with a
+      # bare 404. `enablement: true` turns Pages on (workflow build type) using
+      # the run's own token, so the docs site publishes on the first push.
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:

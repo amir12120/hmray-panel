@@ -23,8 +23,6 @@
 </p>
 
 <p>
-  <a href="https://license.hmray.pro"><img src="https://img.shields.io/badge/Buy_Premium-license.hmray.pro-d97706?style=for-the-badge&logo=gitbook&logoColor=white" alt="Buy Premium"></a>
-  <a href="https://t.me/neolicensebot"><img src="https://img.shields.io/badge/License_bot-@neolicensebot-111827?style=for-the-badge&logo=telegram&logoColor=f59e0b" alt="License bot"></a>
 </p>
 
 <p><a href="#فارسی"><b>فارسی</b></a> &nbsp;·&nbsp; <a href="#english"><b>English</b></a></p>
@@ -43,25 +41,16 @@
 
 ### ✨ تازه‌های نسخه ۳.۰.۱
 
-- **قوانین سرویس فروشگاه (پرمیوم):** نحوه تمدید (اضافه شدن به باقیمانده، شروع از نو، یا **رزرو** تا تمام شدن سرویس فعلی و شروع خودکار)، نام کاربری سرویس‌های جدید (از نام تلگرام، پیشوند + شماره، یا کد تصادفی؛ همیشه بدون تکرار)، **خرید حجم یا زمان اضافه** از ربات، **پلن دلخواه** با قیمت خودکار برای هر گیگ و روز، و **تیکت پشتیبانی** که ادمین با Reply در چت ادمین جواب می‌دهد (*فروشگاه ← تنظیمات ← قوانین سرویس*).
-- **ربات (پرمیوم):** دکمه‌های **لیست قیمت** و **آموزش‌ها**، متن دلخواه صفحه پشتیبانی (مثلاً آیدی پشتیبان)، و پروکسی تلگرام با چسباندن لینک و تست مسیر مستقیم و پروکسی.
-- **شارژ اضطراری (پرمیوم)** در صفحه ساب همه قالب‌ها، فقط برای سرویس‌های خریداری‌شده؛ شارژهای اخیر در تب جدای فروشگاه.
 - **اتصال به پنل‌های ثنایی از طریق پروکسی:** اگر سرور مستقیم به 3x-ui وصل نشود، درخواست‌ها از پروکسی SOCKS5 یا HTTP می‌روند؛ «فقط وقتی مستقیم نشد» یا «همیشه» (*تنظیمات ← عمومی*).
 - **ظرفیت هر پنل:** حداکثر تعداد کلاینت؛ پنل پر کلاینت جدید نمی‌سازد و در فروش جدید نمایش داده نمی‌شود، ولی تمدید کار می‌کند.
 - **گروه‌ها** در خود پنل هم ذخیره می‌شوند و فیلتر گروه به لیست کلاینت‌ها اضافه شد؛ گروه 3x-ui هم همگام می‌شود.
 - **پیام روی لینک ساب**، **جزئیات بازطراحی‌شده کلاینت** (مصرف، انقضا، لینک‌ها و QR) و پنجره «چه چیزی جدید است» برای مدیر اصلی بعد از هر آپدیت.
-- **آپدیت خودکار پرمیوم:** بعد از `hm update`، اگر لایسنس فعال باشد باندل پرمیوم هم خودکار به‌روز می‌شود.
 
 ### ✨ تازه‌های نسخه ۳
 
-- **ظاهر مدرن جدید.** داشبورد، کلاینت‌ها، ادمین‌ها، پنل‌ها، ترافیک و همه صفحه‌های پرمیوم چیدمان و نمودارهای تازه دارند. منوی بالا یا کناری، روشن و تاریک. از ۳.۰.۱ ظاهر جدید با منوی کناری پیش‌فرض است و ظاهر کلاسیک هر وقت بخواهید برمی‌گردد (*تنظیمات ← ظاهر* یا از منوی حساب).
+- **ظاهر مدرن جدید.** داشبورد، کلاینت‌ها، ادمین‌ها، پنل‌ها، ترافیک چیدمان و نمودارهای تازه دارند. منوی بالا یا کناری، روشن و تاریک. از ۳.۰.۱ ظاهر جدید با منوی کناری پیش‌فرض است و ظاهر کلاسیک هر وقت بخواهید برمی‌گردد (*تنظیمات ← ظاهر* یا از منوی حساب).
 - **منوی بالای شخصی.** انتخاب کنید کدام صفحه‌ها (تا ۷ تا) و به چه ترتیبی در منوی بالا باشند (*منوی حساب ← شخصی‌سازی منوی بالا*).
-- **منوی جدای پرمیوم.** دکمه طلایی «پرمیوم» مگامنوی همه ماژول‌های پرمیوم را باز می‌کند. بدون لایسنس، ماژول‌ها قفل‌شده نمایش داده می‌شوند و لینک خرید دارند.
-- **ادمین‌ها:** ساخت ادمین مرحله‌به‌مرحله (نوع حجم کلی یا جدا برای هر پنل همان اول)، پنجره شارژ سریع برای حجم هر پنل، ظرفیت کاربر و روز، و تنظیم دسترسی ماژول‌های پرمیوم از همان صفحه ادمین‌ها.
-- **فروشگاه و ربات تلگرام (پرمیوم):** فقط یک پیام برای هر سفارش (بدون تکرار)، نمایش کد تخفیف روی سفارش، مدیریت جدید کدهای تخفیف، قیمت واضح‌تر و دکمه بازگشت در ربات، جستجوی سفارش و تنظیمات سریع برای ادمین.
-- **محصولات دیجیتال (پرمیوم):** نمای کلی موجودی و فروش، هشدار کمبود موجودی و ساخت گروهی پک‌های تلگرام استارز از روی قیمت ۱۰۰ استارز.
-- **پرداخت به‌ازای مصرف (پرمیوم):** داشبورد جدید؛ مشتری می‌تواند سرویسش را از ربات حذف کند (از پنل هم پاک می‌شود)؛ با تمام شدن موجودی سرویس فقط غیرفعال می‌شود.
-- **فروش نمایندگی (پرمیوم):** چک‌لیست راه‌اندازی و پیش‌نمایش پیشنهاد، و رفع مشکل شارژ نمایندگان با حجم جدا برای هر پنل.
+- **ادمین‌ها:** ساخت ادمین مرحله‌به‌مرحله (نوع حجم کلی یا جدا برای هر پنل همان اول)، پنجره شارژ سریع برای حجم هر پنل، ظرفیت کاربر و روز، و تنظیم دسترسی ماژول‌ها از همان صفحه ادمین‌ها.
 - **حذف کامل و تمیز:** حذف پنل حالا همه چیزهایی که نصب کرده را پاک می‌کند و نصب دوباره بدون خطا انجام می‌شود.
 
 فهرست کامل: [CHANGELOG.md](CHANGELOG.md)
@@ -70,19 +59,11 @@
 
 <table>
   <tr>
-    <td width="50%" align="center"><img src="docs/images/v3/premium-menu.webp" alt="منوی پرمیوم"><br><sub><b>منوی پرمیوم</b></sub></td>
     <td width="50%" align="center"><img src="docs/images/v3/clients.webp" alt="کلاینت‌ها"><br><sub><b>کلاینت‌ها</b></sub></td>
-  </tr>
-  <tr>
     <td width="50%" align="center"><img src="docs/images/v3/admins.webp" alt="ادمین‌ها"><br><sub><b>ادمین‌ها</b></sub></td>
-    <td width="50%" align="center"><img src="docs/images/v3/digital-goods.webp" alt="محصولات دیجیتال"><br><sub><b>محصولات دیجیتال</b></sub></td>
   </tr>
   <tr>
-    <td width="50%" align="center"><img src="docs/images/v3/pay-as-you-go.webp" alt="پرداخت به‌ازای مصرف"><br><sub><b>پرداخت به‌ازای مصرف</b></sub></td>
     <td width="50%" align="center"><img src="docs/images/v3/dashboard-dark.webp" alt="حالت تاریک"><br><sub><b>حالت تاریک</b></sub></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><img src="docs/images/v3/premium-locked.webp" alt="پیش‌نمایش پرمیوم بدون لایسنس"><br><sub><b>پیش‌نمایش پرمیوم بدون لایسنس</b></sub></td>
     <td width="50%" align="center"><img src="docs/images/v3/customize-menu.webp" alt="شخصی‌سازی منوی بالا"><br><sub><b>شخصی‌سازی منوی بالا</b></sub></td>
   </tr>
 </table>
@@ -100,19 +81,12 @@
 - **ظاهر مدرن یا کلاسیک**، فارسی و انگلیسی، روشن و تاریک، قابل نصب به‌صورت اپ (PWA).
 
 **نسخه پرمیوم**
-- **فروشگاه و ربات تلگرام:** فروش پلن با ربات و مینی‌اپ، رسید، کد تخفیف، باشگاه مشتریان، دعوت دوستان و تحویل خودکار.
-- **قوانین سرویس:** تمدید افزایشی، از نو یا رزروی؛ نام‌گذاری خودکار سرویس‌ها؛ فروش حجم و زمان اضافه؛ پلن دلخواه؛ تیکت پشتیبانی؛ لیست قیمت و آموزش‌ها در ربات؛ شارژ اضطراری.
-- **محصولات دیجیتال** با موجودی کد رمزگذاری‌شده و تحویل خودکار یا دستی؛ **پرداخت به‌ازای مصرف** از کیف پول مشتری.
-- **پرداخت:** کارت بانکی، کیف پول کریپتو، درگاه آنلاین و تلگرام استارز.
-- **فروش نمایندگی:** فروش حساب نمایندگی و شارژ نمایندگان از اول تا آخر.
-- **پنل پلاس** (Eylan و Pasarguard)، قالب کلاینت، کمپین بازاریابی، برندینگ، قالب صفحه اشتراک، دامنه اختصاصی، مانیتورینگ و مرکز پشتیبان.
+- بخش‌های پرمیوم کدشان بخشی از این مخزن نیست و جداگانه و اختیاری ارائه می‌شوند.
 
-خرید پرمیوم: [license.hmray.pro](https://license.hmray.pro) یا ربات [@neolicensebot](https://t.me/neolicensebot). لایسنس را در *تنظیمات ← لایسنس پرمیوم* وارد کنید.
-
-> **برای خودِ پنل کلید لایسنس لازم نیست.** هر چیزی که در این مخزن است — نصب، پنل و داشبورد،
-> مدیریت کلاینت‌ها و پنل‌ها، حسابداری ترافیک، CLI (`hm`)، آپدیتر، بکاپ، API و مستندات — با
-> `RELEASE_MODE=COMMUNITY` (پیش‌فرض نصب) کامل و بدون هیچ کلیدی کار می‌کند. لایسنس فقط برای
-> **باندل پرمیوم** است که کدش بخشی از این مخزن نیست و جداگانه توسط فروشندهٔ آن ارائه می‌شود.
+> **بدون هیچ کلید لایسنس.** همه‌ی امکاناتی که در این مخزن هست — نصب، پنل و داشبورد،
+> کلاینت‌ها و پنل‌ها، حسابداری ترافیک، CLI (`hm`)، آپدیتر، بکاپ، API و مستندات — با
+> `RELEASE_MODE=COMMUNITY` (پیش‌فرض نصب) کامل کار می‌کند و رابط کاربری هیچ تبلیغ یا قفل
+> پرمیومی نشان نمی‌دهد.
 
 <a id="نصب"></a>
 
@@ -142,7 +116,7 @@ sudo hm update
 
 <div dir="rtl">
 
-یا `sudo hm` را بزنید و گزینه **Update** را انتخاب کنید. اگر لایسنس پرمیوم فعال باشد، باندل پرمیوم هم بعد از آپدیت پنل خودکار به‌روز می‌شود و نتیجه در پایان آپدیت نمایش داده می‌شود. در صورت نیاز می‌توانید از *تنظیمات ← لایسنس پرمیوم* دکمه **به‌روزرسانی باندل پرمیوم** را دستی بزنید.
+یا `sudo hm` را بزنید و گزینه **Update** را انتخاب کنید.
 
 ### 💾 بکاپ و بازگردانی
 - **از پنل:** *تنظیمات ← نگهداری سیستم* برای دانلود، آپلود یا بازگردانی بکاپ با یک کلیک.
@@ -161,7 +135,7 @@ sudo bash /opt/hmpanel/uninstall.sh --complete   # حذف همه چیز (بای�
 
 <div dir="rtl">
 
-هر دو حالت کانتینرها، سرویس systemd، دستور `hm` و فایل‌های موقت باقی‌مانده را پاک می‌کنند تا نصب بعدی تمیز انجام شود. بعد از حذف استاندارد، با اجرای دوباره نصب‌کننده اطلاعاتتان برمی‌گردد؛ سپس پرمیوم را دوباره فعال کنید.
+هر دو حالت کانتینرها، سرویس systemd، دستور `hm` و فایل‌های موقت باقی‌مانده را پاک می‌کنند تا نصب بعدی تمیز انجام شود. بعد از حذف استاندارد، با اجرای دوباره نصب‌کننده اطلاعاتتان برمی‌گردد.
 
 ### 🔑 ریست رمز ادمین اصلی
 اگر رمز ادمین اصلی (owner / SUPER_ADMIN) را فراموش کردید، روی سرور این دستور را بزنید:
@@ -188,25 +162,16 @@ HMPanel is a **professional management layer built on top of native 3x-ui**, for
 
 ### ✨ What's new in v3.0.1
 
-- **Store service rules (Premium):** how renewals apply (add to what is left, start fresh, or **reserve** until the current service runs out and then start automatically), names for new services (Telegram name, prefix + number, or random code; always unique), **extra volume or time** from the bot, a **custom plan** priced per GB and day, and **support tickets** answered by replying in the admin chat (*Store → Settings → Service rules*).
-- **Bot (Premium):** **Price list** and **Tutorials** buttons, your own support page text (e.g. the support account), and a Telegram proxy you can paste as a link and test against the direct route.
-- **Emergency recharge (Premium)** on the subscription page in every theme, for purchased services only; recent recharges have their own Store tab.
 - **Reach 3x-ui panels through a proxy:** when this server cannot connect to a panel directly, requests go through a SOCKS5 or HTTP proxy, only when direct fails or always (*Settings → General*).
 - **Panel capacity:** a maximum number of clients per panel; a full panel takes no new clients and is left out of new sales, while renewals keep working.
 - **Groups** are also stored in the panel, with a group filter on the client list; the 3x-ui group still syncs.
 - **Subscription message**, **redesigned client details** (usage, expiry, links and QR) and a one-time "What's new" window for the main admin after each update.
-- **Premium auto-update:** after `hm update`, an active license also updates the Premium bundle.
 
 ### ✨ What's new in v3
 
-- **New modern look.** Dashboard, clients, admins, panels, traffic and every Premium page have new layouts and charts. Top bar or sidebar navigation, light and dark. Since 3.0.1 the new look with the side menu is the default; the classic look can be switched back at any time (*Settings → Appearance*, or from the account menu).
+- **New modern look.** Dashboard, clients, admins, panels and traffic have new layouts and charts. Top bar or sidebar navigation, light and dark. Since 3.0.1 the new look with the side menu is the default; the classic look can be switched back at any time (*Settings → Appearance*, or from the account menu).
 - **Your own top menu.** Pick which pages (up to 7) sit in the top bar and in what order (*account menu → Customize top menu*).
-- **Dedicated Premium menu.** A gold Premium button opens a mega menu of every Premium module. Without a license the modules are shown locked, with links to buy.
-- **Admins:** step-by-step admin creation (shared or per-panel traffic is chosen first), a quick top-up dialog for per-panel GB, client capacity and days, and Premium module access set on the Admins page.
-- **Store and Telegram bot (Premium):** one admin message per order (no more duplicates), coupon shown on orders, a redesigned coupon manager, clearer prices and back buttons in the bot, order search and quick settings for admins.
-- **Digital goods (Premium):** stock and sales overview, low-stock alerts, and bulk creation of Telegram Stars packs from the price of 100 stars.
-- **Pay as you go (Premium):** new dashboard, customers can delete their own service from the bot (it is removed from the panel too), an empty wallet only disables the service.
-- **Reseller sales (Premium):** a setup checklist and offer preview, and fixes for per-panel reseller top-ups.
+- **Admins:** step-by-step admin creation (shared or per-panel traffic is chosen first), a quick top-up dialog for per-panel GB, client capacity and days, and per-admin module access set on the Admins page.
 - **Clean uninstall:** removing the panel now deletes everything it installed, so a reinstall works without errors.
 
 Full list: [CHANGELOG.md](CHANGELOG.md).
@@ -215,19 +180,11 @@ Full list: [CHANGELOG.md](CHANGELOG.md).
 
 <table>
   <tr>
-    <td width="50%" align="center"><img src="docs/images/v3/premium-menu.webp" alt="Premium menu"><br><sub><b>Premium menu</b></sub></td>
     <td width="50%" align="center"><img src="docs/images/v3/clients.webp" alt="Clients"><br><sub><b>Clients</b></sub></td>
-  </tr>
-  <tr>
     <td width="50%" align="center"><img src="docs/images/v3/admins.webp" alt="Admins"><br><sub><b>Admins</b></sub></td>
-    <td width="50%" align="center"><img src="docs/images/v3/digital-goods.webp" alt="Digital goods"><br><sub><b>Digital goods</b></sub></td>
   </tr>
   <tr>
-    <td width="50%" align="center"><img src="docs/images/v3/pay-as-you-go.webp" alt="Pay as you go"><br><sub><b>Pay as you go</b></sub></td>
     <td width="50%" align="center"><img src="docs/images/v3/dashboard-dark.webp" alt="Dark mode"><br><sub><b>Dark mode</b></sub></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><img src="docs/images/v3/premium-locked.webp" alt="Premium preview without a license"><br><sub><b>Premium preview without a license</b></sub></td>
     <td width="50%" align="center"><img src="docs/images/v3/customize-menu.webp" alt="Customize the top menu"><br><sub><b>Customize the top menu</b></sub></td>
   </tr>
 </table>
@@ -245,20 +202,12 @@ Full list: [CHANGELOG.md](CHANGELOG.md).
 - **Modern or classic UI**, Persian and English, light and dark, installable as an app (PWA).
 
 **Premium**
-- **Store & Telegram bot:** sell plans with a bot and mini app, receipts, coupons, loyalty, referrals and auto delivery.
-- **Service rules:** additive, fresh or reserved renewals; automatic service names; extra volume and time; custom plans; support tickets; price list and tutorials in the bot; emergency recharge.
-- **Digital goods** with encrypted code stock and automatic or manual delivery; **pay-as-you-go** services billed from the customer wallet.
-- **Payments:** bank cards, crypto wallets, online gateways and Telegram Stars.
-- **Reseller sales:** sell reseller accounts and reseller top-ups end to end.
-- **Panel Plus** (Eylan, Pasarguard), client templates, marketing campaigns, branding, themes, custom domains, monitoring and a backup center.
+- Premium modules are not part of this repository; they are optional and delivered separately.
 
-Buy Premium: [license.hmray.pro](https://license.hmray.pro) or [@neolicensebot](https://t.me/neolicensebot). Enter the license in *Settings → Premium License*.
-
-> **The panel itself never needs a license key.** Everything in this repository — the installer,
-> the panel and dashboard, client and panel management, traffic accounting, the `hm` CLI, the
+> **No license key anywhere.** Every feature that lives in this repository — the installer, the
+> panel and dashboard, client and panel management, traffic accounting, the `hm` CLI, the
 > updater, backups, the API and the docs — works in full with `RELEASE_MODE=COMMUNITY` (the
-> installer default) and no key at all. A license is only for the **Premium bundle**, whose code
-> is not part of this repository and is delivered separately by its vendor.
+> installer default), and the interface shows no premium ads or locked tiles.
 
 <a id="install"></a>
 
@@ -276,7 +225,7 @@ Existing installs update in place; no reinstall is needed and data is kept:
 ```bash
 sudo hm update
 ```
-Or open `sudo hm` and choose **Update**. With an active Premium license, the Premium bundle also updates automatically after the panel update, and the result is shown at the end. You can still press **Update premium bundle** in *Settings → Premium License* by hand if needed.
+Or open `sudo hm` and choose **Update**.
 
 ### 💾 Backup & Restore
 - **Web UI:** *Settings → System Maintenance* to download, upload or restore backups with one click.
@@ -289,7 +238,7 @@ Run `sudo hm` and choose **Uninstall**, or call the script directly:
 sudo bash /opt/hmpanel/uninstall.sh --standard   # remove the app, keep database, uploads, backups and .env
 sudo bash /opt/hmpanel/uninstall.sh --complete   # remove everything (asks you to type DELETE)
 ```
-Both remove the containers, the systemd service, the `hm` command and leftover temp files, so a later reinstall starts clean. After a standard uninstall, run the installer again to come back with your data, then re-activate Premium.
+Both remove the containers, the systemd service, the `hm` command and leftover temp files, so a later reinstall starts clean. After a standard uninstall, run the installer again to come back with your data.
 
 ### 🔑 Reset Main Admin Password
 Forgot the owner / SUPER_ADMIN password? Reset it from the server (interactive prompt):
@@ -336,7 +285,6 @@ Forgot the owner **username** too? `sudo hm admin reset-login` (or `sudo hm rese
 <p>
   <a href="https://t.me/neoaurora">Telegram</a> &nbsp;·&nbsp;
   <a href="https://t.me/hmraysupport">Support</a> &nbsp;·&nbsp;
-  <a href="https://t.me/neolicensebot">License Bot</a> &nbsp;·&nbsp;
   <a href="https://github.com/amir12120">GitHub</a>
 </p>
 

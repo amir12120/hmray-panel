@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { clsx } from "clsx";
-import { ChevronDown, ExternalLink, Gem, Lock, LogOut, PanelTop } from "lucide-react";
+import { ChevronDown, ExternalLink, LogOut, PanelTop } from "lucide-react";
 import { useAuth } from "@/store/auth";
 import { useT } from "@/i18n";
 import { PanelBrandName, PanelLogo } from "@/components/PanelLogo";
@@ -23,7 +23,6 @@ import { NavPinsDialog } from "@/components/NavPinsDialog";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AppearanceControls } from "@/components/AppearanceMenu";
-import { PremiumMegaMenu } from "@/components/PremiumMegaMenu";
 
 /* Pinned pages sit directly in the bar; the user picks them (NavPinsDialog).
    Defaults: DEFAULT_PINS_COMMUNITY / DEFAULT_PINS_PREMIUM in nav-config. */
@@ -77,7 +76,7 @@ function PillLink({ item, pathname }: { item: AppNavItem; pathname: string }) {
       <Icon
         size={16}
         strokeWidth={active ? 2.2 : 1.8}
-        className={clsx("shrink-0", item.isPremium && !active && "text-amber-500")}
+        className="shrink-0"
         aria-hidden
       />
       <span className={clsx("whitespace-nowrap leading-none", !active && "hidden xl:inline")}>{label}</span>
@@ -150,94 +149,6 @@ function SectionMenu({
             />
           ))}
         </div>
-      ) : null}
-    </div>
-  );
-}
-
-/**
- * Premium gets its own gold button that never folds into "More", so it is always
- * one click away and clearly set apart from the free pages.
- */
-function PremiumMenu({
-  groups,
-  pathname,
-  storeHasNewOrders,
-  rechargePendingCount,
-  locked = false,
-}: {
-  groups: AppNavSection[];
-  pathname: string;
-  storeHasNewOrders: boolean;
-  rechargePendingCount: number;
-  locked?: boolean;
-}) {
-  const t = useT();
-  const [openAt, setOpenAt] = useState<string | null>(null);
-  const open = openAt === pathname;
-  const ref = useDismiss(open, () => setOpenAt(null));
-  const closeTimer = useRef<number | null>(null);
-  const active = !locked && groups.some((g) => g.items.some((item) => isActive(pathname, item.href)));
-  const hasDot =
-    !locked &&
-    ((storeHasNewOrders && groups.some((g) => g.items.some((i) => i.moduleId === "store"))) ||
-      (rechargePendingCount > 0 && groups.some((g) => g.items.some((i) => i.moduleId === "admin-recharge"))));
-
-  // Hover opens the menu on mouse devices; a short delay lets the pointer cross the gap.
-  const cancelClose = () => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = null;
-  };
-  const hoverOpen = (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse") return;
-    cancelClose();
-    setOpenAt(pathname);
-  };
-  const hoverClose = (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse") return;
-    cancelClose();
-    closeTimer.current = window.setTimeout(() => setOpenAt(null), 220);
-  };
-  useEffect(() => cancelClose, []);
-
-  return (
-    // Deliberately not `relative`: the mega menu centres under the header, not this button.
-    <div ref={ref} className="shrink-0" onPointerEnter={hoverOpen} onPointerLeave={hoverClose}>
-      <button
-        type="button"
-        onClick={() => setOpenAt(open ? null : pathname)}
-        aria-expanded={open}
-        aria-haspopup="menu"
-        className={clsx(
-          "relative flex h-9 cursor-pointer items-center gap-1.5 rounded-full ps-3 pe-2.5 text-[13.5px] font-semibold transition-[box-shadow] duration-150",
-          "bg-gradient-to-b from-zinc-800 to-zinc-950 ring-1 ring-amber-400/45 shadow-[0_6px_18px_-8px_rgb(245_158_11/0.65)] hover:ring-amber-300/80 dark:to-black",
-          active && "ring-2 ring-amber-300",
-          "outline-none focus-visible:ring-2 focus-visible:ring-amber-300",
-        )}
-      >
-        {locked ? <Lock size={13} strokeWidth={2.4} className="text-amber-300/80" aria-hidden /> : null}
-        <Gem size={15} strokeWidth={2.2} className="text-amber-300" aria-hidden />
-        <span className="whitespace-nowrap bg-gradient-to-l from-amber-100 to-amber-300 bg-clip-text leading-none text-transparent">
-          {t("app.premium")}
-        </span>
-        <ChevronDown
-          size={14}
-          aria-hidden
-          className={clsx("text-amber-300/80 motion-safe:transition-transform motion-safe:duration-200", open && "rotate-180")}
-        />
-        {hasDot ? (
-          <span className="absolute -end-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-rose-500 dark:border-zinc-900" aria-hidden />
-        ) : null}
-      </button>
-      {open ? (
-        <PremiumMegaMenu
-          groups={groups}
-          locked={locked}
-          pathname={pathname}
-          storeHasNewOrders={storeHasNewOrders}
-          rechargePendingCount={rechargePendingCount}
-          onNavigate={() => setOpenAt(null)}
-        />
       ) : null}
     </div>
   );
@@ -415,31 +326,25 @@ function AccountMenu({ onCustomize }: { onCustomize: () => void }) {
 export function ModernTopNav() {
   const t = useT();
   const pathname = usePathname();
-  const { sections, storeHasNewOrders, rechargePendingCount, isPremium, premiumTeaser } = useAppNav();
+  const { sections, storeHasNewOrders, rechargePendingCount, isPremium } = useAppNav();
   const userPins = useNavPins((s) => s.pins);
   const hydratePins = useNavPins((s) => s.hydrate);
   const [customizing, setCustomizing] = useState(false);
   useEffect(() => hydratePins(), [hydratePins]);
   const defaultPins = isPremium ? DEFAULT_PINS_PREMIUM : DEFAULT_PINS_COMMUNITY;
 
-  const { pinned, menus, premium } = useMemo(() => {
+  const { pinned, menus } = useMemo(() => {
     const all = sections.flatMap((s) => s.items);
     // Pins to pages this admin cannot open (role, license) are skipped, not shown broken.
     const pinnedItems = (userPins ?? defaultPins)
       .map((href) => all.find((i) => i.href === href))
       .filter((i): i is AppNavItem => !!i);
     const pinnedSet = new Set(pinnedItems.map((i) => i.href));
-    const isPrem = (i: AppNavItem) => !!i.isPremium || i.href.startsWith("/premium/");
-    // The Premium menu always lists every Premium page, pinned or not.
-    const premiumGroups = sections
-      .map((s) => ({ ...s, items: s.items.filter((i) => isPrem(i)) }))
-      .filter((s) => s.items.length > 0);
     const rest = sections
-      .map((s) => ({ ...s, items: s.items.filter((i) => !pinnedSet.has(i.href) && !isPrem(i)) }))
+      .map((s) => ({ ...s, items: s.items.filter((i) => !pinnedSet.has(i.href)) }))
       .filter((s) => s.items.length > 0 && s.labelKey);
-    return { pinned: pinnedItems, menus: rest, premium: premiumGroups };
+    return { pinned: pinnedItems, menus: rest };
   }, [sections, userPins, defaultPins]);
-  const lockedPremium = !isPremium && premiumTeaser.length > 0;
 
   return (
     <header className="relative z-40 hidden shrink-0 items-center gap-3 px-5 pt-4 md:flex lg:px-8">
@@ -458,18 +363,8 @@ export function ModernTopNav() {
         {pinned.map((item) => (
           <PillLink key={item.href} item={item} pathname={pathname} />
         ))}
-        {(menus.length > 0 || premium.length > 0 || lockedPremium) && pinned.length > 0 ? (
+        {menus.length > 0 && pinned.length > 0 ? (
           <span className="mx-1 h-5 w-px shrink-0 bg-[var(--hm-line)]" aria-hidden />
-        ) : null}
-        {premium.length > 0 ? (
-          <PremiumMenu
-            groups={premium}
-            pathname={pathname}
-            storeHasNewOrders={storeHasNewOrders}
-            rechargePendingCount={rechargePendingCount}
-          />
-        ) : lockedPremium ? (
-          <PremiumMenu groups={premiumTeaser} locked pathname={pathname} storeHasNewOrders={false} rechargePendingCount={0} />
         ) : null}
         <div className="hidden items-center gap-0.5 2xl:flex">
           {menus.map((section) =>

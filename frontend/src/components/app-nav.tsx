@@ -6,7 +6,6 @@ import { clsx } from "clsx";
 import { ChevronDown } from "lucide-react";
 import { useT } from "@/i18n";
 import { NAV_LABEL_KEYS, type AppNavItem, type AppNavSection } from "@/lib/nav-config";
-import { PremiumGem } from "@/components/PremiumGem";
 
 /** Secondary groups collapse; primary routes stay visible. */
 export const COLLAPSIBLE_SECTION_IDS = new Set(["appearance", "tools", "settings"]);
@@ -65,13 +64,6 @@ export function NavItemLink({
         className="shrink-0"
       />
       <span className="min-w-0 flex-1 truncate leading-none">{label}</span>
-      {item.isPremium ? (
-        <PremiumGem
-          size={11}
-          className="shrink-0 text-emerald-500"
-          title={t("app.premium")}
-        />
-      ) : null}
       {rechargeBadge > 0 ? (
         <span
           className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white"

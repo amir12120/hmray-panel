@@ -1,13 +1,12 @@
 "use client";
 
-import { Key, RefreshCw, Power, PowerOff, ExternalLink, Sparkles } from "lucide-react";
+import { Key, RefreshCw, Power, PowerOff, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Card } from "@/components/ui";
 import { useLicenseActivation } from "@/hooks/useLicenseActivation";
 import { formatLicenseExpiry } from "@/lib/format";
 import { useT } from "@/i18n";
 
-const SUPPORT_URL = "https://t.me/hmraysupport";
 
 export function LicenseSettingsCard() {
   const t = useT();
@@ -128,16 +127,6 @@ export function LicenseSettingsCard() {
           </div>
         </div>
       ) : null}
-
-      <a
-        href={SUPPORT_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-sm text-blue-500 hover:text-blue-400 mb-4"
-      >
-        <ExternalLink size={14} />
-        {t("settings.licenseSupportLink")}
-      </a>
 
       {!isPremium ? (
         <div className="space-y-3">

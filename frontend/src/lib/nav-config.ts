@@ -283,26 +283,6 @@ export function buildAppNav(
   return sections.filter((section) => section.items.length > 0);
 }
 
-/**
- * Premium modules shown (locked) to a super admin without a license, so they can
- * see what Premium adds before buying. Order = order in the mega menu.
- */
-export const PREMIUM_TEASER: Array<{ moduleId: string; href: string; fallback: string }> = [
-  { moduleId: "store", href: "/premium/store", fallback: "Store" },
-  { moduleId: "store-digital", href: "/premium/store-digital", fallback: "Digital goods" },
-  { moduleId: "store-payg", href: "/premium/store-payg", fallback: "Pay as you go" },
-  { moduleId: "payment-management", href: "/premium/payment-management", fallback: "Payments" },
-  { moduleId: "admin-recharge", href: "/premium/admin-recharge", fallback: "Reseller sales" },
-  { moduleId: "marketing", href: "/premium/marketing", fallback: "Marketing" },
-  { moduleId: "external-panels", href: "/premium/external-panels", fallback: "Panel Plus" },
-  { moduleId: "client-templates", href: "/premium/client-templates", fallback: "Client templates" },
-  { moduleId: "branding", href: "/premium/branding", fallback: "Branding" },
-  { moduleId: "themes", href: "/premium/themes", fallback: "Themes" },
-  { moduleId: "custom-domains", href: "/premium/domains", fallback: "Custom domains" },
-  { moduleId: "monitoring-pro", href: "/premium/monitoring", fallback: "Monitoring Pro" },
-  { moduleId: "backup-center", href: "/premium/backups", fallback: "Backup center" },
-];
-
 /** Top-bar pins when the user has not chosen their own. Premium puts selling first. */
 export const DEFAULT_PINS_COMMUNITY = ["/dashboard", "/clients", "/admins", "/panels", "/traffic"];
 export const DEFAULT_PINS_PREMIUM = ["/dashboard", "/clients", "/premium/store", "/premium/admin-recharge", "/admins", "/panels"];

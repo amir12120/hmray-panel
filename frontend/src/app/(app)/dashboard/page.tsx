@@ -20,7 +20,6 @@ import type { Overview, SeriesPoint, Trends, Monitoring } from "@/lib/types";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { Card, Spinner, ErrorBox, Badge } from "@/components/ui";
 import { PluginSlot } from "@/components/PluginSlot";
-import { CommunityAdsCard } from "@/components/CommunityAdsCard";
 import { useToast } from "@/components/toast";
 import { useAuth } from "@/store/auth";
 import { useLicenseActivation } from "@/hooks/useLicenseActivation";
@@ -111,8 +110,8 @@ function RevenueCard({ revenue }: { revenue?: RevenueSummary }) {
   );
 }
 
-/** Premium → aggregate revenue; Community → sponsored ad strip (no revenue module). */
-function RevenueOrAdsSlot({ revenue }: { revenue?: RevenueSummary }) {
+/** Premium → aggregate revenue. Without the revenue module the slot stays empty. */
+function RevenueSlot({ revenue }: { revenue?: RevenueSummary }) {
   const { licenseQuery } = useLicenseActivation();
   const isPremium =
     licenseQuery.data?.edition === "PREMIUM" &&
@@ -129,7 +128,7 @@ function RevenueOrAdsSlot({ revenue }: { revenue?: RevenueSummary }) {
   }
 
   if (isPremium) return <RevenueCard revenue={revenue} />;
-  return <CommunityAdsCard />;
+  return null;
 }
 
 function MetricBar({ label, pct }: { label: string; pct: number }) {
@@ -275,7 +274,7 @@ function SuperDashboard() {
         inboundData={inboundData}
         newClients={trends.data?.allTime?.newClients ?? []}
         livePanels={livePanels}
-        revenueSlot={<RevenueOrAdsSlot revenue={o.revenue} />}
+        revenueSlot={<RevenueSlot revenue={o.revenue} />}
       />
     );
   }
@@ -346,7 +345,7 @@ function SuperDashboard() {
 
         <Kpi icon={Activity} tone="text-cyan-400" label={t("dashboard.todaysUsage")} value={o.usage?.today != null ? formatBytes(Number(o.usage.today)) : t("dashboard.unknown")} />
         <Kpi icon={CalendarDays} tone="text-purple-400" label={t("dashboard.monthlyUsage")} value={o.usage?.monthly != null ? formatBytes(Number(o.usage.monthly)) : t("dashboard.unknown")} />
-        <RevenueOrAdsSlot revenue={o.revenue} />
+        <RevenueSlot revenue={o.revenue} />
       </div>
 
       {/* Traffic chart with range toggle */}

@@ -35,7 +35,7 @@ export default function PremiumSettingsPage() {
       <div className="space-y-6">
         <PageHeader title={t("premium.settingsTitle")} subtitle={t("premium.settingsSubtitle")} />
         <Card className="p-6 text-sm text-zinc-500">
-          Activate your premium license under Global Settings → Premium License.
+          No premium module bundle is installed on this panel.
         </Card>
       </div>
     );
